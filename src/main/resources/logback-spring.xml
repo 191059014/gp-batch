@@ -4,7 +4,7 @@
 <configuration>
 
     <springProperty scope="context" name="logging.path" source="logging.path"/>
-    <springProperty scope="context" name="logging.level" source="logging.level.com.hb.web"/>
+    <springProperty scope="context" name="logging.level" source="logging.level.com.hb.batch"/>
 
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -19,11 +19,11 @@
     <appender name="COMMON-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <append>true</append>
         <!-- 设置日志名称 -->
-        <file>${logging.path}/gp-common.log</file>
+        <file>${logging.path}/gp-batch-common.log</file>
         <!-- 使用滚动策略 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 日志文件输出的文件名-->
-            <FileNamePattern>${logging.path}/gp-common.%d{yyyy-MM-dd}.log
+            <FileNamePattern>${logging.path}/gp-batch-common.%d{yyyy-MM-dd}.log
             </FileNamePattern>
             <!-- 日志文件保留天数-->
             <MaxHistory>30</MaxHistory>
@@ -52,11 +52,11 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <!-- 设置日志名称 -->
-        <file>${logging.path}/gp-error.log</file>
+        <file>${logging.path}/gp-batch-error.log</file>
         <!-- 使用滚动策略 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 日志文件输出的文件名-->
-            <FileNamePattern>${logging.path}/gp-error.%d{yyyy-MM-dd}.log
+            <FileNamePattern>${logging.path}/gp-batch-error.%d{yyyy-MM-dd}.log
             </FileNamePattern>
             <!-- 日志文件保留天数-->
             <MaxHistory>30</MaxHistory>
