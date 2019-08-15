@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hb.web.mapper.OrderMapper">
+    <resultMap id="BaseResultMap" type="com.hb.entity.OrderDO">
+        <id column="orderId" property="orderId" jdbcType="VARCHAR"/>
+        <result column="userId" property="userId" jdbcType="VARCHAR"/>
+        <result column="userName" property="userName" jdbcType="VARCHAR"/>
+        <result column="stockCode" property="stockCode" jdbcType="VARCHAR"/>
+        <result column="stockName" property="stockName" jdbcType="VARCHAR"/>
+        <result column="buyNumber" property="buyNumber" jdbcType="INTEGER"/>
+        <result column="buyPrice" property="buyPrice" jdbcType="DECIMAL"/>
+        <result column="buyPriceTotal" property="buyPriceTotal" jdbcType="DECIMAL"/>
+        <result column="sellPrice" property="sellPrice" jdbcType="DECIMAL"/>
+        <result column="sellPriceTotal" property="sellPriceTotal" jdbcType="DECIMAL"/>
+        <result column="orderStatus" property="orderStatus" jdbcType="INTEGER"/>
+        <result column="profit" property="profit" jdbcType="DECIMAL"/>
+        <result column="profitRate" property="profitRate" jdbcType="DECIMAL"/>
+        <result column="strategyOwnMoney" property="strategyOwnMoney" jdbcType="DECIMAL"/>
+        <result column="serviceMoney" property="serviceMoney" jdbcType="DECIMAL"/>
+        <result column="delayMoney" property="delayMoney" jdbcType="DECIMAL"/>
+        <result column="strategyMoney" property="strategyMoney" jdbcType="DECIMAL"/>
+        <result column="stopEarnMoney" property="stopEarnMoney" jdbcType="DECIMAL"/>
+        <result column="stopLossMoney" property="stopLossMoney" jdbcType="DECIMAL"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="createUserId" property="createUserId" jdbcType="VARCHAR"/>
+        <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="updateUserId" property="updateUserId" jdbcType="VARCHAR"/>
+        <result column="recordStatus" property="recordStatus" jdbcType="INTEGER"/>
+        <result column="parentId" property="parentId" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="INTEGER"/>
+    </resultMap>
+
+
+</mapper>
