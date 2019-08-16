@@ -40,19 +40,19 @@
 
         <dependency>
             <groupId>com.hb.unic</groupId>
-            <artifactId>unic-logger</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.hb.unic</groupId>
             <artifactId>unic-base</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.hb.entity</groupId>
-            <artifactId>gp-entity</artifactId>
+            <groupId>com.hb.web</groupId>
+            <artifactId>gp-facade</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hb.remote</groupId>
+            <artifactId>remote-api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
