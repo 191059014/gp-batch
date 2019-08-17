@@ -1,48 +1,43 @@
 package com.hb.batch.impl;
 
-import com.hb.batch.vo.RiskControlRequestVO;
-import com.hb.unic.logger.Logger;
-import com.hb.unic.logger.LoggerFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.hb.batch.mapper.OrderMapper;
+import com.hb.batch.service.IOrderService;
+import com.hb.facade.vo.appvo.request.HotStockVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
- * ========== 订单服务 ==========
+ * ========== 订单操作service实现类 ==========
  *
  * @author Mr.huang
- * @version com.hb.batch.impl.OrderServiceImpl.java, v1.0
- * @date 2019年08月15日 22时12分
+ * @version com.hb.web.impl.OrderServiceImpl.java, v1.0
+ * @date 2019年06月25日 23时26分
  */
-@RestController
-@RequestMapping("batch/order")
-public class OrderServiceImpl {
+@Service
+public class OrderServiceImpl implements IOrderService {
 
-    /**
-     * 日志
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+    @Autowired
+    private OrderMapper orderMapper;
 
-    @PostMapping("/riskControl")
-    public void riskControl(@RequestBody RiskControlRequestVO requestVO) {
-        String userId = requestVO == null ? "" : requestVO.getUserId();
-        if (StringUtils.isBlank(userId)) {
-            LOGGER.info("用户ID为空，直接跳出...");
-            return;
+    @Override
+    public Set<String> getHotStockSet(int number) {
+        List<HotStockVO> hotStockList = orderMapper.getHotStockList();
+        Collections.sort(hotStockList, new Comparator<HotStockVO>() {
+            @Override
+            public int compare(HotStockVO o1, HotStockVO o2) {
+                return o1.getTotalNum().compareTo(o2.getTotalNum());
+            }
+        });
+        Set<String> set = new HashSet<>();
+        for (int i = hotStockList.size() - 1; i > -1; i--) {
+            if (i == hotStockList.size() - number - 1) {
+                break;
+            }
+            set.add(hotStockList.get(i).getStockCode());
         }
-        LOGGER.info("用户:{}，开始进行批处理任务...");
-        /**
-         * 1.查询该用户下所有 持仓中或者委托中的订单
-         */
-
-        /**
-         * 2.根据订单的股票代码查询各股票的实时行情
-         */
-
-
-
+        return set;
     }
 
 }

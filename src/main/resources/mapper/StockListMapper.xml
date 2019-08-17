@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hb.batch.mapper.StockListMapper">
+    <resultMap id="BaseResultMap" type="com.hb.facade.entity.StockListDO">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="full_code" property="full_code" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="TINYINT"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, code, name, full_code, type
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from stock_list
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="getStockListByStockCodeSet" resultType="com.hb.facade.entity.StockListDO">
+        select * from stock_list where code in
+        <foreach collection="collection" item="stockCode" open="(" close=")" separator=",">
+            #{stockCode}
+        </foreach>
+    </select>
+
+    <select id="findPageList" resultType="com.hb.facade.entity.StockListDO">
+        select * from stock_list where code like CONCAT(#{stockCode},"%") order by code
+        <if test="pageSize != null and pageSize != 0">
+            <![CDATA[ limit #{startRow},#{pageSize} ]]>
+        </if>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from stock_list
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.hb.facade.entity.StockListDO">
+    insert into stock_list (id, code, name, 
+      full_code, type)
+    values (#{id,jdbcType=INTEGER}, #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{full_code,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hb.facade.entity.StockListDO">
+        insert into stock_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="full_code != null">
+                full_code,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="full_code != null">
+                #{full_code,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=TINYINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hb.facade.entity.StockListDO">
+        update stock_list
+        <set>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="full_code != null">
+                full_code = #{full_code,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                type = #{type,jdbcType=TINYINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hb.facade.entity.StockListDO">
+    update stock_list
+    set code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      full_code = #{full_code,jdbcType=VARCHAR},
+      type = #{type,jdbcType=TINYINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
