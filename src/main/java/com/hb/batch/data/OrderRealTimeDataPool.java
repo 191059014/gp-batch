@@ -41,7 +41,7 @@ public class OrderRealTimeDataPool {
         orderList.forEach(order -> {
             String orderId = order.getOrderId();
             orderMap.put(orderId, order);
-            LOGGER.info("订单号：{}，用户名：{}，加入订单数据池", orderId);
+            LOGGER.info("订单号：{}，用户名：{}，加入订单数据池", orderId, order.getUserName());
         });
         LOGGER.info("订单数据池flush后长度：{}", orderMap.size());
     }
