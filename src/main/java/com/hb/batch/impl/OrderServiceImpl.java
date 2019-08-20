@@ -2,6 +2,7 @@ package com.hb.batch.impl;
 
 import com.hb.batch.mapper.OrderMapper;
 import com.hb.batch.service.IOrderService;
+import com.hb.facade.entity.OrderDO;
 import com.hb.facade.vo.appvo.request.HotStockVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,22 @@ public class OrderServiceImpl implements IOrderService {
             set.add(hotStockList.get(i).getStockCode());
         }
         return set;
+    }
+
+    @Override
+    public Set<String> getStockCodeByOrderStatus(Set<Integer> orderStatusSet) {
+        if (orderStatusSet == null || orderStatusSet.size() < 1) {
+            return null;
+        }
+        return orderMapper.getStockCodeByOrderStatus(orderStatusSet);
+    }
+
+    @Override
+    public List<OrderDO> getOrderListByOrderStatusAndTime(Set<Integer> orderStatuSet, Date date) {
+        if (orderStatuSet == null || orderStatuSet.size() < 1) {
+            return null;
+        }
+        return orderMapper.getOrderListByOrderStatusAndTime(orderStatuSet, date);
     }
 
 }

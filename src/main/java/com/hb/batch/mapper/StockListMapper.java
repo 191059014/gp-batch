@@ -24,4 +24,6 @@ public interface StockListMapper {
 
     List<StockListDO> findPageList(@Param("stockCode") String stockCode, @Param("startRow") Integer startRow, @Param("pageSize") Integer pageSize);
 
+    List<StockListDO> getAllStockList();
+
 }

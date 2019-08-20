@@ -1,5 +1,9 @@
 package com.hb.batch.service;
 
+import com.hb.facade.entity.OrderDO;
+
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,5 +22,22 @@ public interface IOrderService {
      * @return 股票代码集合
      */
     Set<String> getHotStockSet(int number);
+
+    /**
+     * ########## 通过订单状态集合查询股票代码集合 ##########
+     *
+     * @param orderStatusSet 订单状态集合
+     * @return 股票代码集合
+     */
+    Set<String> getStockCodeByOrderStatus(Set<Integer> orderStatusSet);
+
+    /**
+     * ########## 通过订单状态集合查询订单集合 ##########
+     *
+     * @param orderStatuSet 订单状态集合
+     * @param date          日期
+     * @return 订单集合
+     */
+    List<OrderDO> getOrderListByOrderStatusAndTime(Set<Integer> orderStatuSet, Date date);
 
 }

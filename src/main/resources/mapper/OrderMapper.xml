@@ -137,6 +137,25 @@
         and recordStatus=1
     </select>
 
+    <select id="getStockCodeByOrderStatus" resultType="java.lang.String">
+        select stockCode from t_order where orderStatus in
+        <foreach collection="orderStatuSet" item="orderStatus" open="(" close=")" separator=",">
+            #{orderStatus}
+        </foreach>
+        and recordStatus=1
+    </select>
+
+    <select id="getOrderListByOrderStatusAndTime" resultType="com.hb.facade.entity.OrderDO">
+        select * from t_order where orderStatus in
+        <foreach collection="orderStatuSet" item="orderStatus" open="(" close=")" separator=",">
+            #{orderStatus}
+        </foreach>
+        and recordStatus=1
+        <if test="date != null">
+            <![CDATA[ and createTime >= #{date} ]]>
+        </if>
+    </select>
+
     <sql id="selectByConditionSql">
         <if test="orderDO.orderId != null and orderDO.orderId != ''">
             and orderId=#{orderDO.orderId}
