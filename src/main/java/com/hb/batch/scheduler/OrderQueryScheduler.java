@@ -8,7 +8,6 @@ import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -57,7 +56,6 @@ public class OrderQueryScheduler {
      * ########## 周一到周五每天9点至23点开始，5秒钟轮询一次，查询新增的订单 ##########
      */
     @Scheduled(cron = "0/5 * 9-23 ? * MON-FRI")
-    @Async("asyncOrderTaskExecutor")
     public void queryOrderScheduler() {
         long start = System.currentTimeMillis();
         LOGGER.info("轮询查询订单，批次：queryOrderScheduler_" + DateUtils.getCurrentDateStr(DateUtils.YYYYMMDDHHMMSS));
