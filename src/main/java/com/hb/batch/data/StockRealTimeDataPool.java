@@ -39,4 +39,8 @@ public class StockRealTimeDataPool {
         });
     }
 
+    public StockModel get(String stockCode) {
+        return stockMap.get(stockCode);
+    }
+
 }

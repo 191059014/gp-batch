@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hb.batch.mapper.CustomerFundDetailMapper">
+    <resultMap id="BaseResultMap" type="com.hb.facade.entity.CustomerFundDetailDO">
+        <id column="detailId" property="detailId" jdbcType="VARCHAR"/>
+        <result column="userId" property="userId" jdbcType="VARCHAR"/>
+        <result column="userName" property="userName" jdbcType="VARCHAR"/>
+        <result column="agentId" property="agentId" jdbcType="VARCHAR"/>
+        <result column="agentName" property="agentName" jdbcType="VARCHAR"/>
+        <result column="happenMoney" property="happenMoney" jdbcType="DECIMAL"/>
+        <result column="afterHappenMoney" property="afterHappenMoney" jdbcType="DECIMAL"/>
+        <result column="fundType" property="fundType" jdbcType="INTEGER"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="createUserId" property="createUserId" jdbcType="VARCHAR"/>
+        <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="updateUserId" property="updateUserId" jdbcType="VARCHAR"/>
+        <result column="recordStatus" property="recordStatus" jdbcType="INTEGER"/>
+        <result column="parentId" property="parentId" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <insert id="insertSelective" parameterType="com.hb.facade.entity.CustomerFundDetailDO">
+        <selectKey keyProperty="detailId" resultType="string" order="BEFORE">
+            SELECT CONCAT(#{userId},'_',count(*)+1) from t_customer_fund_detail where userId=#{userId};
+        </selectKey>
+        insert into t_customer_fund_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            detailId,
+            <if test="userId != null">
+                userId,
+            </if>
+            <if test="userName != null">
+                userName,
+            </if>
+            <if test="agentId != null">
+                agentId,
+            </if>
+            <if test="agentName != null">
+                agentName,
+            </if>
+            <if test="happenMoney != null">
+                happenMoney,
+            </if>
+            <if test="afterHappenMoney != null">
+                afterHappenMoney,
+            </if>
+            <if test="fundType != null">
+                fundType,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+            <if test="createUserId != null">
+                createUserId,
+            </if>
+            <if test="updateTime != null">
+                updateTime,
+            </if>
+            <if test="updateUserId != null">
+                updateUserId,
+            </if>
+            <if test="recordStatus != null">
+                recordStatus,
+            </if>
+            <if test="parentId != null">
+                parentId,
+            </if>
+            <if test="unit != null">
+                unit,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            #{detailId,jdbcType=VARCHAR},
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="userName != null">
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="agentId != null">
+                #{agentId,jdbcType=VARCHAR},
+            </if>
+            <if test="agentName != null">
+                #{agentName,jdbcType=VARCHAR},
+            </if>
+            <if test="happenMoney != null">
+                #{happenMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="afterHappenMoney != null">
+                #{afterHappenMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="fundType != null">
+                #{fundType,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserId != null">
+                #{createUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserId != null">
+                #{updateUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="recordStatus != null">
+                #{recordStatus,jdbcType=INTEGER},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=VARCHAR},
+            </if>
+            <if test="unit != null">
+                #{unit,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

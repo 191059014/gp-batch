@@ -4,6 +4,7 @@ import com.hb.batch.mapper.OrderMapper;
 import com.hb.batch.service.IOrderService;
 import com.hb.facade.entity.OrderDO;
 import com.hb.facade.vo.appvo.request.HotStockVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +56,19 @@ public class OrderServiceImpl implements IOrderService {
             return null;
         }
         return orderMapper.getOrderListByOrderStatusAndTime(orderStatuSet, date);
+    }
+
+    @Override
+    public List<OrderDO> findByUserIdAndOrderStatus(String userId, Set<Integer> orderStatuSet) {
+        return orderMapper.findByUserIdAndOrderStatus(userId, orderStatuSet);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(OrderDO orderDO) {
+        if (StringUtils.isBlank(orderDO.getOrderId())) {
+            return 0;
+        }
+        return orderMapper.updateByPrimaryKeySelective(orderDO);
     }
 
 }

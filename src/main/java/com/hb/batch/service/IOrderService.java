@@ -40,4 +40,20 @@ public interface IOrderService {
      */
     List<OrderDO> getOrderListByOrderStatusAndTime(Set<Integer> orderStatuSet, Date date);
 
+    /**
+     * ########## 通过用户ID和订单状态集合查询股票代码集合 ##########
+     *
+     * @param orderStatuSet 订单状态集合
+     * @return 股票代码集合
+     */
+    List<OrderDO> findByUserIdAndOrderStatus(String userId, Set<Integer> orderStatuSet);
+
+    /**
+     * ########## 根据主键更新订单 ##########
+     *
+     * @param orderDO din订单信息
+     * @return 更新的行数
+     */
+    int updateByPrimaryKeySelective(OrderDO orderDO);
+
 }

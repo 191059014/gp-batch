@@ -18,12 +18,12 @@ import java.util.Set;
  * ========== 股票查询runable ==========
  *
  * @author Mr.huang
- * @version com.hb.batch.runable.StockQueryRunable.java, v1.0
+ * @version com.hb.batch.runable.StockQueryRunnable.java, v1.0
  * @date 2019年08月20日 01时33分
  */
-public class StockQueryRunable implements Runnable {
+public class StockQueryRunnable implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StockQueryRunable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StockQueryRunnable.class);
 
     private int batchCount = BatchConstant.QUERY_BATCH_COUNT;
 
@@ -35,7 +35,7 @@ public class StockQueryRunable implements Runnable {
 
     private StockRealTimeDataPool stockRealTimeDataPool;
 
-    public StockQueryRunable(Set<String> stockCodeSet, IStockService stockService, IStockListService stockListService, StockRealTimeDataPool stockRealTimeDataPool) {
+    public StockQueryRunnable(Set<String> stockCodeSet, IStockService stockService, IStockListService stockListService, StockRealTimeDataPool stockRealTimeDataPool) {
         this.stockCodeSet = stockCodeSet;
         this.stockService = stockService;
         this.stockListService = stockListService;
