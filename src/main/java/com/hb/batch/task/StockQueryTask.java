@@ -112,7 +112,7 @@ public class StockQueryTask implements InitializingBean {
         }
         LOGGER.info("添加股票查询任务：{}", stockCodeSet.size());
         Runnable runnable = new StockQueryRunnable(stockCodeSet, stockService, stockListService);
-        runnable.run();
+        new Thread(runnable).start();
         LOGGER.info("添加股票查询任务完成：{}", stockMap.size());
     }
 
@@ -132,6 +132,7 @@ public class StockQueryTask implements InitializingBean {
      * @param stockModelList 股票信息集合
      */
     public static void updateStockMap(List<StockModel> stockModelList) {
+        LOGGER.info("更新股票实时数据池：{}", stockModelList.size());
         if (CollectionUtils.isEmpty(stockModelList)) {
             return;
         }
@@ -142,6 +143,7 @@ public class StockQueryTask implements InitializingBean {
     }
 
     public static StockModel getStock(String stockCode) {
+        LOGGER.info("股票实时数据池：{}", stockMap.keySet());
         return stockMap.get(stockCode);
     }
 

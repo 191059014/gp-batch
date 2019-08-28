@@ -64,6 +64,7 @@ public class UserOrderRunnable implements Runnable {
     @Override
     public void run() {
         List<OrderDO> orderList = OrderQueryTask.getOrderListByUserId(userId);
+        LOGGER.info("用户ID：{}，风险控制开始", userId);
         if (CollectionUtils.isEmpty(orderList)) {
             return;
         }
@@ -72,8 +73,10 @@ public class UserOrderRunnable implements Runnable {
         for (OrderDO orderDO : orderList) {
             String userName = orderDO.getUserName();
             String orderId = orderDO.getOrderId();
+            String stockCode = orderDO.getStockCode();
             try {
-                StockModel stockModel = StockQueryTask.getStock(orderDO.getStockCode());
+                LOGGER.info("订单号：{}，股票代码：{}，风险控制开始", orderId, stockCode);
+                StockModel stockModel = StockQueryTask.getStock(stockCode);
                 // 当前价格
                 BigDecimal currentPrice = stockModel.getCurrentPrice();
                 // 止盈价格
@@ -103,6 +106,7 @@ public class UserOrderRunnable implements Runnable {
                 BigDecimal riskPercent = new BigDecimal(riskMaxPercent);
                 BigDecimal maxLossMoney = BigDecimalUtils.multiply(strategyOwnMoney, riskPercent);
                 BigDecimal stockQueryStrategy = BigDecimalUtils.divide(BigDecimalUtils.divide(lossMoney, maxLossMoney).abs(), riskPercent);
+                LOGGER.info("订单号：{}，股票代码：{}，风险控制策略：{}", orderId, stockCode, stockQueryStrategy);
                 changeQueryStockStrategy(userId, stockCodeSet, stockQueryStrategy);
                 if (BigDecimal.ZERO.compareTo(lossMoney) < 0 && lossMoney.abs().compareTo(maxLossMoney) >= 0) {
                     // 平仓
@@ -110,6 +114,7 @@ public class UserOrderRunnable implements Runnable {
                     completeOrder(orderDO, stockModel);
                     continue;
                 }
+                LOGGER.info("订单号：{}，股票代码：{}，风险控制结束", orderId, stockCode);
             } catch (Exception e) {
                 LOGGER.error("用户：{}，订单号：{}，风控过程中出现异常：{}", userName, orderId, LogHelper.getStackTrace(e));
             }

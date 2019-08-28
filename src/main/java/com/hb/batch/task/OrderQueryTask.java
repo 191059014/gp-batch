@@ -61,7 +61,7 @@ public class OrderQueryTask implements InitializingBean {
         loadPendingOrders(null);
     }
 
-    @Scheduled(cron = "0/5 * 9-15 ? * MON-FRI")
+    @Scheduled(cron = "0/5 * 9-23 ? * MON-FRI")
     public void loadPendingOrdersScheduler() {
         loadPendingOrders(lastQueryTime);
     }
