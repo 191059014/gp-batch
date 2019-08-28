@@ -1,6 +1,6 @@
 package com.hb.batch.test;
 
-import com.hb.batch.task.IStockQueryTask;
+import com.hb.batch.task.StockQueryTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestTaskController {
 
     @Autowired
-    private IStockQueryTask iStockQueryTask;
+    private StockQueryTask stockQueryTask;
 
     @GetMapping("/test")
     public void test() {

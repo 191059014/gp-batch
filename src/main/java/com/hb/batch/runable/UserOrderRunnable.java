@@ -1,11 +1,10 @@
 package com.hb.batch.runable;
 
-import com.hb.batch.data.OrderRealTimeDataPool;
-import com.hb.batch.data.StockRealTimeDataPool;
 import com.hb.batch.service.ICustomerFundDetailService;
 import com.hb.batch.service.ICustomerFundService;
 import com.hb.batch.service.IOrderService;
-import com.hb.batch.task.IStockQueryTask;
+import com.hb.batch.task.OrderQueryTask;
+import com.hb.batch.task.StockQueryTask;
 import com.hb.facade.entity.CustomerFundDO;
 import com.hb.facade.entity.CustomerFundDetailDO;
 import com.hb.facade.entity.OrderDO;
@@ -14,6 +13,7 @@ import com.hb.facade.enumutil.OrderStatusEnum;
 import com.hb.remote.model.StockModel;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.helper.LogHelper;
 import com.hb.unic.util.util.BigDecimalUtils;
 import com.hb.unic.util.util.DateUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -25,45 +25,33 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * ========== Description ==========
+ * ========== 订单风控 ==========
  *
  * @author Mr.huang
- * @version com.hb.batch.runable.OrderControlRunnable.java, v1.0
+ * @version com.hb.batch.runable.UserOrderRunnable.java, v1.0
  * @date 2019年08月24日 18时37分
  */
-public class OrderControlRunnable implements Runnable {
+public class UserOrderRunnable implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderControlRunnable.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserOrderRunnable.class);
 
     private IOrderService iOrderService;
-
-    private OrderRealTimeDataPool orderRealTimeDataPool;
-
-    private StockRealTimeDataPool stockRealTimeDataPool;
-
     private ICustomerFundService iCustomerFundService;
-
     private ICustomerFundDetailService iCustomerFundDetailService;
-
-    private IStockQueryTask iStockQueryTask;
-
+    private StockQueryTask stockQueryTask;
     private String userId;
-
     private String riskMaxPercent;
-
     private String per_5s;
     private String per_4s;
     private String per_3s;
     private String per_2s;
     private String per_1s;
 
-    public OrderControlRunnable(IOrderService iOrderService, OrderRealTimeDataPool orderRealTimeDataPool, StockRealTimeDataPool stockRealTimeDataPool, ICustomerFundService iCustomerFundService, ICustomerFundDetailService iCustomerFundDetailService, IStockQueryTask iStockQueryTask, String userId, String riskMaxPercent, String per_5s, String per_4s, String per_3s, String per_2s, String per_1s) {
+    public UserOrderRunnable(IOrderService iOrderService, ICustomerFundService iCustomerFundService, ICustomerFundDetailService iCustomerFundDetailService, StockQueryTask stockQueryTask, String userId, String riskMaxPercent, String per_5s, String per_4s, String per_3s, String per_2s, String per_1s) {
         this.iOrderService = iOrderService;
-        this.orderRealTimeDataPool = orderRealTimeDataPool;
-        this.stockRealTimeDataPool = stockRealTimeDataPool;
         this.iCustomerFundService = iCustomerFundService;
         this.iCustomerFundDetailService = iCustomerFundDetailService;
-        this.iStockQueryTask = iStockQueryTask;
+        this.stockQueryTask = stockQueryTask;
         this.userId = userId;
         this.riskMaxPercent = riskMaxPercent;
         this.per_5s = per_5s;
@@ -75,7 +63,7 @@ public class OrderControlRunnable implements Runnable {
 
     @Override
     public void run() {
-        List<OrderDO> orderList = orderRealTimeDataPool.getOrderListByUserId(userId);
+        List<OrderDO> orderList = OrderQueryTask.getOrderListByUserId(userId);
         if (CollectionUtils.isEmpty(orderList)) {
             return;
         }
@@ -84,42 +72,46 @@ public class OrderControlRunnable implements Runnable {
         for (OrderDO orderDO : orderList) {
             String userName = orderDO.getUserName();
             String orderId = orderDO.getOrderId();
-            StockModel stockModel = stockRealTimeDataPool.get(orderDO.getStockCode());
-            // 当前价格
-            BigDecimal currentPrice = stockModel.getCurrentPrice();
-            // 止盈价格
-            BigDecimal stopEarnMoney = orderDO.getStopEarnMoney();
-            // 止损价格
-            BigDecimal stopLossMoney = orderDO.getStopLossMoney();
-            if (BigDecimal.ZERO.compareTo(stopEarnMoney) != 0 && currentPrice.compareTo(stopEarnMoney) >= 0) {
-                // 当前价格>=止盈价格，平仓
-                LOGGER.info("用户姓名：{}，订单号：{}，当前价格({})>=止盈价格({})，进行平仓操作", userName, orderId, currentPrice, stopEarnMoney);
-                completeOrder(orderDO, stockModel);
-                continue;
-            }
-            if (BigDecimal.ZERO.compareTo(stopLossMoney) != 0 && currentPrice.compareTo(stopLossMoney) <= 0) {
-                // 当前价格<=止损价格，平仓
-                LOGGER.info("用户姓名：{}，订单号：{}，当前价格({})<=止损价格({})，进行平仓操作", userName, orderId, currentPrice, stopLossMoney);
-                completeOrder(orderDO, stockModel);
-                continue;
-            }
-            BigDecimal buyPrice = orderDO.getBuyPrice();
-            Integer buyNumber = orderDO.getBuyNumber();
-            if (currentPrice.compareTo(buyPrice) >= 0) {
-                continue;
-            }
-            BigDecimal lossMoneyUnit = BigDecimalUtils.subtract(currentPrice, buyPrice, 4);
-            BigDecimal lossMoney = BigDecimalUtils.multiply(lossMoneyUnit, new BigDecimal(buyNumber));
-            BigDecimal strategyOwnMoney = orderDO.getStrategyOwnMoney();
-            BigDecimal riskPercent = new BigDecimal(riskMaxPercent);
-            BigDecimal maxLossMoney = BigDecimalUtils.multiply(strategyOwnMoney, riskPercent);
-            BigDecimal stockQueryStrategy = BigDecimalUtils.divide(BigDecimalUtils.divide(lossMoney, maxLossMoney).abs(), riskPercent);
-            changeQueryStockStrategy(userId, stockCodeSet, stockQueryStrategy);
-            if (BigDecimal.ZERO.compareTo(lossMoney) < 0 && lossMoney.abs().compareTo(maxLossMoney) >= 0) {
-                // 平仓
-                LOGGER.info("用户姓名：{}，订单号：{}，当前价格({})已经达到亏损阀值（{}），进行平仓操作", userName, orderId, currentPrice, riskMaxPercent);
-                completeOrder(orderDO, stockModel);
-                continue;
+            try {
+                StockModel stockModel = StockQueryTask.getStock(orderDO.getStockCode());
+                // 当前价格
+                BigDecimal currentPrice = stockModel.getCurrentPrice();
+                // 止盈价格
+                BigDecimal stopEarnMoney = orderDO.getStopEarnMoney();
+                // 止损价格
+                BigDecimal stopLossMoney = orderDO.getStopLossMoney();
+                if (BigDecimal.ZERO.compareTo(stopEarnMoney) != 0 && currentPrice.compareTo(stopEarnMoney) >= 0) {
+                    // 当前价格>=止盈价格，平仓
+                    LOGGER.info("用户姓名：{}，订单号：{}，当前价格({})>=止盈价格({})，进行平仓操作", userName, orderId, currentPrice, stopEarnMoney);
+                    completeOrder(orderDO, stockModel);
+                    continue;
+                }
+                if (BigDecimal.ZERO.compareTo(stopLossMoney) != 0 && currentPrice.compareTo(stopLossMoney) <= 0) {
+                    // 当前价格<=止损价格，平仓
+                    LOGGER.info("用户姓名：{}，订单号：{}，当前价格({})<=止损价格({})，进行平仓操作", userName, orderId, currentPrice, stopLossMoney);
+                    completeOrder(orderDO, stockModel);
+                    continue;
+                }
+                BigDecimal buyPrice = orderDO.getBuyPrice();
+                Integer buyNumber = orderDO.getBuyNumber();
+                if (currentPrice.compareTo(buyPrice) >= 0) {
+                    continue;
+                }
+                BigDecimal lossMoneyUnit = BigDecimalUtils.subtract(currentPrice, buyPrice, 4);
+                BigDecimal lossMoney = BigDecimalUtils.multiply(lossMoneyUnit, new BigDecimal(buyNumber));
+                BigDecimal strategyOwnMoney = orderDO.getStrategyOwnMoney();
+                BigDecimal riskPercent = new BigDecimal(riskMaxPercent);
+                BigDecimal maxLossMoney = BigDecimalUtils.multiply(strategyOwnMoney, riskPercent);
+                BigDecimal stockQueryStrategy = BigDecimalUtils.divide(BigDecimalUtils.divide(lossMoney, maxLossMoney).abs(), riskPercent);
+                changeQueryStockStrategy(userId, stockCodeSet, stockQueryStrategy);
+                if (BigDecimal.ZERO.compareTo(lossMoney) < 0 && lossMoney.abs().compareTo(maxLossMoney) >= 0) {
+                    // 平仓
+                    LOGGER.info("用户姓名：{}，订单号：{}，当前价格({})已经达到亏损阀值（{}），进行平仓操作", userName, orderId, currentPrice, riskMaxPercent);
+                    completeOrder(orderDO, stockModel);
+                    continue;
+                }
+            } catch (Exception e) {
+                LOGGER.error("用户：{}，订单号：{}，风控过程中出现异常：{}", userName, orderId, LogHelper.getStackTrace(e));
             }
         }
     }
@@ -130,20 +122,20 @@ public class OrderControlRunnable implements Runnable {
     private void changeQueryStockStrategy(String userId, Set<String> stockCodeSet, BigDecimal abs) {
 
         if (abs.compareTo(new BigDecimal("0.2")) > 0) {
-            iStockQueryTask.stop(userId);
-            iStockQueryTask.start(per_5s, stockCodeSet, userId);
+            stockQueryTask.stopTask(userId);
+            stockQueryTask.startTask(per_5s, stockCodeSet, userId);
         } else if (abs.compareTo(new BigDecimal("0.4")) > 0) {
-            iStockQueryTask.stop(userId);
-            iStockQueryTask.start(per_4s, stockCodeSet, userId);
+            stockQueryTask.stopTask(userId);
+            stockQueryTask.startTask(per_4s, stockCodeSet, userId);
         } else if (abs.compareTo(new BigDecimal("0.6")) > 0) {
-            iStockQueryTask.stop(userId);
-            iStockQueryTask.start(per_3s, stockCodeSet, userId);
+            stockQueryTask.stopTask(userId);
+            stockQueryTask.startTask(per_3s, stockCodeSet, userId);
         } else if (abs.compareTo(new BigDecimal("0.8")) > 0) {
-            iStockQueryTask.stop(userId);
-            iStockQueryTask.start(per_2s, stockCodeSet, userId);
+            stockQueryTask.stopTask(userId);
+            stockQueryTask.startTask(per_2s, stockCodeSet, userId);
         } else if (abs.compareTo(new BigDecimal("0.9")) > 0) {
-            iStockQueryTask.stop(userId);
-            iStockQueryTask.start(per_1s, stockCodeSet, userId);
+            stockQueryTask.stopTask(userId);
+            stockQueryTask.startTask(per_1s, stockCodeSet, userId);
         }
 
     }

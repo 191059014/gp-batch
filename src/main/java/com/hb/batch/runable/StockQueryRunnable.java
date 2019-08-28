@@ -1,8 +1,8 @@
 package com.hb.batch.runable;
 
 import com.hb.batch.constant.BatchConstant;
-import com.hb.batch.data.StockRealTimeDataPool;
 import com.hb.batch.service.IStockListService;
+import com.hb.batch.task.StockQueryTask;
 import com.hb.facade.entity.StockListDO;
 import com.hb.remote.model.StockModel;
 import com.hb.remote.service.IStockService;
@@ -33,13 +33,10 @@ public class StockQueryRunnable implements Runnable {
 
     private IStockListService stockListService;
 
-    private StockRealTimeDataPool stockRealTimeDataPool;
-
-    public StockQueryRunnable(Set<String> stockCodeSet, IStockService stockService, IStockListService stockListService, StockRealTimeDataPool stockRealTimeDataPool) {
+    public StockQueryRunnable(Set<String> stockCodeSet, IStockService stockService, IStockListService stockListService) {
         this.stockCodeSet = stockCodeSet;
         this.stockService = stockService;
         this.stockListService = stockListService;
-        this.stockRealTimeDataPool = stockRealTimeDataPool;
     }
 
     @Override
@@ -58,12 +55,12 @@ public class StockQueryRunnable implements Runnable {
                 List<String> subList = stockCodeList.subList((i - 1) * batchCount, i * batchCount);
                 Set<String> subSet = new HashSet<>(subList);
                 List<StockModel> stockModelList = stockService.queryStockList(subSet);
-                stockRealTimeDataPool.updateStockMap(stockModelList);
+                StockQueryTask.updateStockMap(stockModelList);
             } else {
                 List<String> subList = stockCodeList.subList((i - 1) * batchCount, stockCodeList.size() - 1);
                 Set<String> subSet = new HashSet<>(subList);
                 List<StockModel> stockModelList = stockService.queryStockList(subSet);
-                stockRealTimeDataPool.updateStockMap(stockModelList);
+                StockQueryTask.updateStockMap(stockModelList);
                 break;
             }
             i++;
