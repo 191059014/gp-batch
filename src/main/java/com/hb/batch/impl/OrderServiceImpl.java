@@ -4,6 +4,8 @@ import com.hb.batch.mapper.OrderMapper;
 import com.hb.batch.service.IOrderService;
 import com.hb.facade.entity.OrderDO;
 import com.hb.facade.vo.appvo.request.HotStockVO;
+import com.hb.unic.logger.Logger;
+import com.hb.unic.logger.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,12 @@ import java.util.*;
  */
 @Service
 public class OrderServiceImpl implements IOrderService {
+
+    /**
+     * 日志
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+
 
     @Autowired
     private OrderMapper orderMapper;
@@ -39,6 +47,7 @@ public class OrderServiceImpl implements IOrderService {
             }
             set.add(hotStockList.get(i).getStockCode());
         }
+        LOGGER.info("查询热门股票结果：{}", set);
         return set;
     }
 
