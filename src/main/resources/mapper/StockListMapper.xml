@@ -25,7 +25,9 @@
     </select>
 
     <select id="findPageList" resultType="com.hb.facade.entity.StockListDO">
-        select * from stock_list where code like CONCAT(#{stockCode},"%") order by code
+        select * from stock_list where (
+        (code like CONCAT(#{queryText},"%")) or (name like CONCAT("%",#{queryText},"%")))
+        order by code
         <if test="pageSize != null and pageSize != 0">
             <![CDATA[ limit #{startRow},#{pageSize} ]]>
         </if>

@@ -22,7 +22,7 @@ public interface StockListMapper {
 
     List<StockListDO> getStockListByStockCodeSet(Set<String> stockCodeSet);
 
-    List<StockListDO> findPageList(@Param("stockCode") String stockCode, @Param("startRow") Integer startRow, @Param("pageSize") Integer pageSize);
+    List<StockListDO> findPageList(@Param("queryText") String queryText, @Param("startRow") Integer startRow, @Param("pageSize") Integer pageSize);
 
     List<StockListDO> getAllStockList();
 

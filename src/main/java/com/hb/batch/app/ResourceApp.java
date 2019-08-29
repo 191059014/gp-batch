@@ -127,12 +127,12 @@ public class ResourceApp extends BaseApp {
         return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS, new StockQueryResponseVO(stockModelList));
     }
 
-    @ApiOperation(value = "根据股票代码模糊搜索股票信息")
-    @PostMapping("/findPageList")
-    public AppResultModel<List<StockListDO>> findPageList(@RequestBody StockQueryPageRequestVO requestVO) {
+    @ApiOperation(value = "根据股票代码或者名称模糊搜索股票信息")
+    @PostMapping("/findStockPagesByCodeOrName")
+    public AppResultModel<List<StockListDO>> findStockPagesByCodeOrName(@RequestBody StockQueryPageRequestVO requestVO) {
         LOGGER.info(LogUtils.appLog("根据股票代码模糊搜索股票信息，入参：{}"), requestVO);
-        String stockCode = requestVO.getStockCode();
-        if (StringUtils.isBlank(stockCode)) {
+        String queryText = requestVO.getQueryText();
+        if (StringUtils.isBlank(queryText)) {
             return AppResultModel.generateResponseData(AppResponseCodeEnum.FAIL);
         }
         Integer pageSize = requestVO.getPageSize();
@@ -140,7 +140,7 @@ public class ResourceApp extends BaseApp {
             pageSize = 100;
         }
         Integer startRow = requestVO.getStartRow() == null ? 0 : requestVO.getStartRow();
-        List<StockListDO> pageList = stockListService.findPageList(stockCode, startRow, pageSize);
+        List<StockListDO> pageList = stockListService.findPageList(queryText, startRow, pageSize);
         LOGGER.info(LogUtils.appLog("根据股票代码模糊搜索股票信息，出参：{}"), pageList);
         return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS, pageList);
     }

@@ -63,8 +63,8 @@ public class StockListServiceImpl implements IStockListService, InitializingBean
     }
 
     @Override
-    public List<StockListDO> findPageList(String stockCode, Integer startRow, Integer pageSize) {
-        return stockListMapper.findPageList(stockCode, startRow, pageSize);
+    public List<StockListDO> findPageList(String queryText, Integer startRow, Integer pageSize) {
+        return stockListMapper.findPageList(queryText, startRow, pageSize);
     }
 
     public List<StockListDO> getAllStockList() {

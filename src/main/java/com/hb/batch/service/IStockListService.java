@@ -18,5 +18,5 @@ public interface IStockListService {
 
     List<StockListDO> getStockListBySet(Set<String> stockCodeSet);
 
-    List<StockListDO> findPageList(String stockCode, Integer startRow, Integer pageSize);
+    List<StockListDO> findPageList(String queryText, Integer startRow, Integer pageSize);
 }
