@@ -225,8 +225,8 @@ public class UserOrderRunnable implements Runnable {
         add.setUserId(userId);
         add.setUserName(orderDO.getUserName());
         add.setHappenMoney(delayMoneyTotal);
-        add.setFundType(FundTypeEnum.DEFERRED_FEE.getValue());
-        add.setRemark("递延费扣除");
+        add.setFundType(FundTypeEnum.DELAY.getValue());
+        add.setRemark(FundTypeEnum.DELAY.getDesc());
         iCustomerFundDetailService.addOne(add);
         LOGGER.info("用户姓名：{}，订单号：{}，新增客户资金流水：{}", userId, orderId, add);
         CustomerFundDetailDO add1 = new CustomerFundDetailDO();
@@ -234,7 +234,7 @@ public class UserOrderRunnable implements Runnable {
         add1.setUserName(orderDO.getUserName());
         add1.setHappenMoney(orderDO.getServiceMoney());
         add1.setFundType(FundTypeEnum.FREEZE.getValue());
-        add1.setRemark("服务费扣除");
+        add1.setRemark(FundTypeEnum.FREEZE.getDesc());
         iCustomerFundDetailService.addOne(add1);
         LOGGER.info("用户姓名：{}，订单号：{}，新增客户资金流水：{}", userId, orderId, add1);
     }
