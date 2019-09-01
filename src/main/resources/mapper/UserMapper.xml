@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hb.batch.mapper.UserMapper">
+
+    <select id="findUser" resultType="com.hb.facade.entity.UserDO">
+        select * from t_user where 1=1
+        <include refid="sqlCondition"/>
+    </select>
+
+    <sql id="sqlCondition">
+        <if test="userDO.userId != null and userDO.userId !=''">
+            <![CDATA[ and userId = #{userDO.userId} ]]>
+        </if>
+        <if test="userDO.userName != null and userDO.userName !=''">
+            <![CDATA[ and userName = #{userDO.userName} ]]>
+        </if>
+        <if test="userDO.realName != null and userDO.realName !=''">
+            <![CDATA[ and realName = #{userDO.realName} ]]>
+        </if>
+        <if test="userDO.password != null and userDO.password !=''">
+            <![CDATA[ and password = #{userDO.password} ]]>
+        </if>
+        <if test="userDO.bankName != null and userDO.bankName !=''">
+            <![CDATA[ and bankName = #{userDO.bankName} ]]>
+        </if>
+        <if test="userDO.bankNo != null and userDO.bankNo !=''">
+            <![CDATA[ and bankNo = #{userDO.bankNo} ]]>
+        </if>
+        <if test="userDO.idCardNo != null and userDO.idCardNo !=''">
+            <![CDATA[ and idCardNo = #{userDO.idCardNo} ]]>
+        </if>
+        <if test="userDO.realAuthStatus != null and userDO.realAuthStatus !=''">
+            <![CDATA[ and realAuthStatus = #{userDO.realAuthStatus} ]]>
+        </if>
+        <if test="userDO.bankRealAuthStatus != null and userDO.bankRealAuthStatus !=''">
+            <![CDATA[ and bankRealAuthStatus = #{userDO.bankRealAuthStatus} ]]>
+        </if>
+        <if test="userDO.mobile != null and userDO.mobile !=''">
+            <![CDATA[ and mobile = #{userDO.mobile} ]]>
+        </if>
+        <if test="userDO.inviterMobile != null and userDO.inviterMobile !=''">
+            <![CDATA[ and inviterMobile = #{userDO.inviterMobile} ]]>
+        </if>
+        <if test="userDO.riskLevel != null and userDO.riskLevel !=''">
+            <![CDATA[ and riskLevel = #{userDO.riskLevel} ]]>
+        </if>
+        <if test="userDO.riskScore != null and userDO.riskScore !=''">
+            <![CDATA[ and riskScore = #{userDO.riskScore} ]]>
+        </if>
+        <if test="userDO.createTime != null">
+            <![CDATA[ and createTime = #{userDO.createTime} ]]>
+        </if>
+        <if test="userDO.createUserId != null and userDO.createUserId !=''">
+            <![CDATA[ and createUserId = #{userDO.createUserId} ]]>
+        </if>
+        <if test="userDO.updateTime != null">
+            <![CDATA[ and updateTime = #{userDO.updateTime} ]]>
+        </if>
+        <if test="userDO.updateUserId != null and userDO.updateUserId !=''">
+            <![CDATA[ and updateUserId = #{userDO.updateUserId} ]]>
+        </if>
+        <if test="userDO.parentId != null and userDO.parentId !=''">
+            <![CDATA[ and parentId = #{userDO.parentId} ]]>
+        </if>
+        <if test="userDO.unit != null and userDO.unit !=''">
+            <![CDATA[ and unit = #{userDO.unit} ]]>
+        </if>
+        and recordStatus = "1"
+    </sql>
+
+</mapper>

@@ -1,6 +1,7 @@
 package com.hb.batch.runable;
 
 import com.hb.batch.constant.BatchConstant;
+import com.hb.batch.container.SpringUtil;
 import com.hb.batch.service.IStockListService;
 import com.hb.batch.task.StockQueryTask;
 import com.hb.facade.entity.StockListDO;
@@ -27,23 +28,22 @@ public class StockQueryRunnable implements Runnable {
 
     private int batchCount = BatchConstant.QUERY_BATCH_COUNT;
 
-    private Set<String> stockCodeSet;
+    private Set<String> querySet;
 
     private IStockService stockService;
 
     private IStockListService stockListService;
 
-    public StockQueryRunnable(Set<String> stockCodeSet, IStockService stockService, IStockListService stockListService) {
-        this.stockCodeSet = stockCodeSet;
-        this.stockService = stockService;
-        this.stockListService = stockListService;
+    public StockQueryRunnable(Set<String> stockCodeSet) {
+        this.querySet=stockCodeSet;
+        this.stockService = SpringUtil.getBean(IStockService.class);
+        this.stockListService = SpringUtil.getBean(IStockListService.class);
     }
 
     @Override
     public void run() {
         LOGGER.info("当前线程：{}", Thread.currentThread().getName());
-        LOGGER.info("待查询股票代码：" + stockCodeSet);
-        List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockCodeSet);
+        List<StockListDO> stockListDOList = stockListService.getStockListBySet(querySet);
         List<String> stockCodeList = new ArrayList<>();
         for (StockListDO stockListDO : stockListDOList) {
             stockCodeList.add(stockListDO.getFull_code());

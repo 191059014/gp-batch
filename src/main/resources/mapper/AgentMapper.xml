@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hb.batch.mapper.AgentMapper">
+    <resultMap id="BaseResultMap" type="com.hb.facade.entity.AgentDO">
+        <result column="agentId" property="agentId" jdbcType="VARCHAR"/>
+        <result column="agentName" property="agentName" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="agentLevel" property="agentLevel" jdbcType="INTEGER"/>
+        <result column="bankName" property="bankName" jdbcType="VARCHAR"/>
+        <result column="bankNo" property="bankNo" jdbcType="VARCHAR"/>
+        <result column="idCardNo" property="idCardNo" jdbcType="VARCHAR"/>
+        <result column="realAuthStatus" property="realAuthStatus" jdbcType="INTEGER"/>
+        <result column="mobile" property="mobile" jdbcType="VARCHAR"/>
+        <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="createUserId" property="createUserId" jdbcType="VARCHAR"/>
+        <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="updateUserId" property="updateUserId" jdbcType="VARCHAR"/>
+        <result column="recordStatus" property="recordStatus" jdbcType="INTEGER"/>
+        <result column="parentId" property="parentId" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="findAgent" resultType="com.hb.facade.entity.AgentDO">
+        select * from t_agent where 1=1
+        <include refid="sqlCondition"/>
+    </select>
+
+    <sql id="sqlCondition">
+        <if test="agentDO.agentId != null and agentDO.agentId !=''">
+            <![CDATA[ and agentId = #{agentDO.agentId} ]]>
+        </if>
+        <if test="agentDO.agentName != null and agentDO.agentName !=''">
+            <![CDATA[ and agentName = #{agentDO.agentName} ]]>
+        </if>
+        <if test="agentDO.password != null and agentDO.password !=''">
+            <![CDATA[ and password = #{agentDO.password} ]]>
+        </if>
+        <if test="agentDO.agentLevel != null and agentDO.agentLevel !=''">
+            <![CDATA[ and agentLevel = #{agentDO.agentLevel} ]]>
+        </if>
+        <if test="agentDO.bankName != null and agentDO.bankName !=''">
+            <![CDATA[ and bankName = #{agentDO.bankName} ]]>
+        </if>
+        <if test="agentDO.bankNo != null and agentDO.bankNo !=''">
+            <![CDATA[ and bankNo = #{agentDO.bankNo} ]]>
+        </if>
+        <if test="agentDO.idCardNo != null and agentDO.idCardNo !=''">
+            <![CDATA[ and idCardNo = #{agentDO.idCardNo} ]]>
+        </if>
+        <if test="agentDO.realAuthStatus != null and agentDO.realAuthStatus !=''">
+            <![CDATA[ and realAuthStatus = #{agentDO.realAuthStatus} ]]>
+        </if>
+        <if test="agentDO.mobile != null and agentDO.mobile !=''">
+            <![CDATA[ and mobile = #{agentDO.mobile} ]]>
+        </if>
+        <if test="agentDO.createTime != null">
+            <![CDATA[ and createTime = #{agentDO.createTime} ]]>
+        </if>
+        <if test="agentDO.createUserId != null and agentDO.createUserId !=''">
+            <![CDATA[ and createUserId = #{agentDO.createUserId} ]]>
+        </if>
+        <if test="agentDO.updateTime != null">
+            <![CDATA[ and updateTime = #{agentDO.updateTime} ]]>
+        </if>
+        <if test="agentDO.updateUserId != null and agentDO.updateUserId !=''">
+            <![CDATA[ and updateUserId = #{agentDO.updateUserId} ]]>
+        </if>
+        <if test="agentDO.parentId != null and agentDO.parentId !=''">
+            <![CDATA[ and parentId = #{agentDO.parentId} ]]>
+        </if>
+        <if test="agentDO.unit != null and agentDO.unit !=''">
+            <![CDATA[ and unit = #{agentDO.unit} ]]>
+        </if>
+        and recordStatus = "1"
+    </sql>
+
+</mapper>

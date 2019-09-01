@@ -1,0 +1,12 @@
+{
+  "android": {
+    "versionCode": 1,
+    "versionName": "1.0.0"
+  },
+  "deposit":[5, 6, 7, 8],
+  "stopMaxPercent": 0.2,
+  "stopMinPercent": 0.8,
+  "serviceMoneyPercent":0.005,
+  "delayMoneyPercent":0.002,
+  "specialHoliday":["20190913","20191001","20191002","20191003","20191004","20191007"]
+}

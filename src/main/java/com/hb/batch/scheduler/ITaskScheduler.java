@@ -2,9 +2,6 @@ package com.hb.batch.scheduler;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
-import java.util.Map;
-import java.util.concurrent.ScheduledFuture;
-
 /**
  * ========== 任务调度接口 ==========
  *
@@ -16,20 +13,12 @@ public interface ITaskScheduler {
 
     /**
      * ########## 开启任务调度 ##########
+     *
      * @param cron      表达式
      * @param runnable  runnable对象
      * @param taskId    任务唯一标识
-     * @param scheduler
-     * @param futureMap
+     * @param scheduler 线程池
      */
-    void start(String cron, Runnable runnable, String taskId, ThreadPoolTaskScheduler scheduler, Map<String, ScheduledFuture> futureMap);
-
-    /**
-     * ########## 停止任务调度 ##########
-     * @param taskId    任务唯一标识
-     * @param futureMap
-     *
-     */
-    void stop(String taskId, Map<String, ScheduledFuture> futureMap);
+    void start(String cron, Runnable runnable, String taskId, ThreadPoolTaskScheduler scheduler);
 
 }
