@@ -10,6 +10,7 @@ import com.hb.facade.common.AppResultModel;
 import com.hb.facade.entity.StockListDO;
 import com.hb.facade.vo.appvo.request.StockQueryPageRequestVO;
 import com.hb.facade.vo.appvo.request.StockQueryRequestVO;
+import com.hb.facade.vo.appvo.response.QueryStockPagesResponseVO;
 import com.hb.remote.model.StockIndexModel;
 import com.hb.remote.model.StockModel;
 import com.hb.remote.service.IStockService;
@@ -129,8 +130,9 @@ public class ResourceApp extends BaseApp {
 
     @ApiOperation(value = "根据股票代码或者名称模糊搜索股票信息")
     @PostMapping("/findStockPagesByCodeOrName")
-    public AppResultModel<List<StockListDO>> findStockPagesByCodeOrName(@RequestBody StockQueryPageRequestVO requestVO) {
+    public AppResultModel<QueryStockPagesResponseVO> findStockPagesByCodeOrName(@RequestBody StockQueryPageRequestVO requestVO) {
         LOGGER.info(LogUtils.appLog("根据股票代码模糊搜索股票信息，入参：{}"), requestVO);
+        QueryStockPagesResponseVO responseVO = new QueryStockPagesResponseVO();
         String queryText = requestVO.getQueryText();
         if (StringUtils.isBlank(queryText)) {
             return AppResultModel.generateResponseData(AppResponseCodeEnum.FAIL);
@@ -141,8 +143,9 @@ public class ResourceApp extends BaseApp {
         }
         Integer startRow = requestVO.getStartRow() == null ? 0 : requestVO.getStartRow();
         List<StockListDO> pageList = stockListService.findPageList(queryText, startRow, pageSize);
-        LOGGER.info(LogUtils.appLog("根据股票代码模糊搜索股票信息，出参：{}"), pageList);
-        return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS, pageList);
+        responseVO.setStockSearchList(pageList);
+        LOGGER.info(LogUtils.appLog("根据股票代码模糊搜索股票信息，出参：{}"), responseVO);
+        return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS, responseVO);
     }
 
 }

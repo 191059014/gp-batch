@@ -48,7 +48,7 @@ public class StockQueryTask implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        startTask();
+
     }
 
     /**
