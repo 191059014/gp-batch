@@ -21,6 +21,22 @@
         <result column="strategyMoney" property="strategyMoney" jdbcType="DECIMAL"/>
         <result column="stopEarnMoney" property="stopEarnMoney" jdbcType="DECIMAL"/>
         <result column="stopLossMoney" property="stopLossMoney" jdbcType="DECIMAL"/>
+
+        <result column="backDelayMoney" property="backDelayMoney" jdbcType="DECIMAL"/>
+        <result column="residueDelayDays" property="residueDelayDays" jdbcType="INTEGER"/>
+        <result column="backDelayDays" property="backDelayDays" jdbcType="INTEGER"/>
+
+        <result column="appendMoney" property="appendMoney" jdbcType="DECIMAL"/>
+        <result column="delayDays" property="delayDays" jdbcType="INTEGER"/>
+
+        <result column="buyTime" property="buyTime" jdbcType="TIMESTAMP"/>
+        <result column="delayEndTime" property="delayEndTime" jdbcType="TIMESTAMP"/>
+        <result column="sellTime" property="sellTime" jdbcType="TIMESTAMP"/>
+        <result column="cancelTime" property="cancelTime" jdbcType="TIMESTAMP"/>
+        <result column="entrustPrice" property="entrustPrice" jdbcType="DECIMAL"/>
+        <result column="entrustNumber" property="entrustNumber" jdbcType="INTEGER"/>
+        <result column="sellNumber" property="sellNumber" jdbcType="INTEGER"/>
+
         <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="createUserId" property="createUserId" jdbcType="VARCHAR"/>
         <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
@@ -30,10 +46,7 @@
         <result column="unit" property="unit" jdbcType="INTEGER"/>
     </resultMap>
     <sql id="Base_Column_List">
-    orderId, userId, userName, stockCode, stockName, buyNumber, buyPrice, buyPriceTotal, 
-    sellPrice, sellPriceTotal, orderStatus, profit, profitRate, strategyOwnMoney, serviceMoney, 
-    delayMoney, strategyMoney, stopEarnMoney, stopLossMoney, createTime, createUserId, 
-    updateTime, updateUserId, recordStatus, parentId, unit
+    *
   </sql>
 
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
@@ -99,6 +112,42 @@
             </if>
             <if test="stopLossMoney != null">
                 stopLossMoney = #{stopLossMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="appendMoney != null">
+                appendMoney = #{appendMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="delayDays != null">
+                delayDays = #{delayDays,jdbcType=INTEGER},
+            </if>
+            <if test="buyTime != null">
+                buyTime = #{buyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="delayEndTime != null">
+                delayEndTime = #{delayEndTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sellTime != null">
+                sellTime = #{sellTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="cancelTime != null">
+                cancelTime = #{cancelTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="entrustPrice != null">
+                entrustPrice = #{entrustPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="entrustNumber != null">
+                entrustNumber = #{entrustNumber,jdbcType=INTEGER},
+            </if>
+            <if test="sellNumber != null">
+                sellNumber = #{sellNumber,jdbcType=INTEGER},
+            </if>
+            <if test="backDelayMoney != null">
+                backDelayMoney = #{backDelayMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="residueDelayDays != null">
+                residueDelayDays = #{residueDelayDays,jdbcType=INTEGER},
+            </if>
+            <if test="backDelayDays != null">
+                backDelayDays = #{backDelayDays,jdbcType=INTEGER},
             </if>
             <if test="createTime != null">
                 createTime = #{createTime,jdbcType=TIMESTAMP},
