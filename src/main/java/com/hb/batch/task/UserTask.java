@@ -35,14 +35,14 @@ public class UserTask implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        startTask();
+
     }
 
 
     /**
      * ########## 开启用户任务 ##########
      */
-    private void startTask() {
+    public void startTask() {
         Runnable runnable = new UserRunnable();
         iTaskScheduler.start(defaultCron, runnable, getTaskId(), userTaskScheduler);
     }

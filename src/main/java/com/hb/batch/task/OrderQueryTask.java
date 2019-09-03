@@ -54,14 +54,13 @@ public class OrderQueryTask implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        loadPendingOrders();
-        startTask();
+
     }
 
     /**
      * ########## 加载待处理的订单 ##########
      */
-    private void loadPendingOrders() {
+    public void loadPendingOrders() {
         Runnable runnable = new OrderQueryRunnable();
         orderQueryTaskScheduler.execute(runnable);
     }
@@ -69,7 +68,7 @@ public class OrderQueryTask implements InitializingBean {
     /**
      * 开始任务
      */
-    private void startTask() {
+    public void startTask() {
         Runnable runnable = new OrderQueryRunnable();
         iTaskScheduler.start(defaultCron, runnable, getTaskId(), orderQueryTaskScheduler);
     }
