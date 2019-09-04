@@ -170,7 +170,7 @@ public class RiskControlTaskService {
         // 卖出总价格
         orderDO.setSellPriceTotal(BigDecimalUtils.add(strategyMoney, profit));
         // 订单状态
-        orderDO.setOrderStatus(OrderStatusEnum.ALREADY_SETTLED.getValue());
+        orderDO.setOrderStatus(OrderStatusEnum.ALREADY_SELL.getValue());
         // 利润
         orderDO.setProfit(profit);
         // 盈亏率
