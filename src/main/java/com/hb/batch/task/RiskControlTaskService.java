@@ -78,7 +78,7 @@ public class RiskControlTaskService {
                     completeOrder(orderDO, stockModel);
                     continue;
                 }
-                if (StockTools.isSellDate(orderDO.getCreateTime(), orderDO.getDelayDays()) && isForceSellTimeBetween()) {
+                if (new Date().after(orderDO.getDelayEndTime())) {
                     //  递延到期，平仓
                     LOGGER.info("用户姓名：{}，订单号：{}，递延到期，进行平仓操作", userName, orderId);
                     completeOrder(orderDO, stockModel);
@@ -170,7 +170,7 @@ public class RiskControlTaskService {
         // 卖出总价格
         orderDO.setSellPriceTotal(BigDecimalUtils.add(strategyMoney, profit));
         // 订单状态
-        orderDO.setOrderStatus(OrderStatusEnum.ALREADY_SETTLED.getValue());
+        orderDO.setOrderStatus(OrderStatusEnum.ALREADY_SELL.getValue());
         // 利润
         orderDO.setProfit(profit);
         // 盈亏率
