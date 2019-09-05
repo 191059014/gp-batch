@@ -1,6 +1,6 @@
 package com.hb.batch.runable;
 
-import com.hb.batch.container.SpringUtil;
+import com.hb.unic.base.container.BaseServiceLocator;
 import com.hb.batch.service.IOrderService;
 import com.hb.batch.task.OrderQueryTask;
 import com.hb.facade.entity.OrderDO;
@@ -32,8 +32,8 @@ public class OrderQueryRunnable implements Runnable {
             this.lastQueryDate = new Date(OrderQueryTask.lastQueryTime);
         }
         OrderQueryTask.lastQueryTime = System.currentTimeMillis();
-        orderService = SpringUtil.getBean(IOrderService.class);
-        orderQueryTask = SpringUtil.getBean(OrderQueryTask.class);
+        orderService = BaseServiceLocator.getBean(IOrderService.class);
+        orderQueryTask = BaseServiceLocator.getBean(OrderQueryTask.class);
     }
 
     @Override

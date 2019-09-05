@@ -1,6 +1,6 @@
 package com.hb.batch.runable;
 
-import com.hb.batch.container.SpringUtil;
+import com.hb.unic.base.container.BaseServiceLocator;
 import com.hb.batch.task.OrderQueryTask;
 import com.hb.batch.task.RiskControlTaskService;
 import com.hb.facade.calc.StockTools;
@@ -28,8 +28,8 @@ public class UserRunnable implements Runnable {
     private ThreadPoolTaskScheduler userOrderTaskScheduler;
 
     public UserRunnable() {
-        riskControlTaskService = SpringUtil.getBean(RiskControlTaskService.class);
-        userOrderTaskScheduler = (ThreadPoolTaskScheduler) SpringUtil.getBean("userOrderTaskScheduler");
+        riskControlTaskService = BaseServiceLocator.getBean(RiskControlTaskService.class);
+        userOrderTaskScheduler = (ThreadPoolTaskScheduler) BaseServiceLocator.getBean("userOrderTaskScheduler");
     }
 
     @Override

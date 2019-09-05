@@ -1,7 +1,7 @@
 package com.hb.batch.runable;
 
 import com.hb.batch.constant.BatchConstant;
-import com.hb.batch.container.SpringUtil;
+import com.hb.unic.base.container.BaseServiceLocator;
 import com.hb.batch.service.IStockListService;
 import com.hb.batch.task.StockQueryTask;
 import com.hb.facade.entity.StockListDO;
@@ -36,8 +36,8 @@ public class StockQueryRunnable implements Runnable {
 
     public StockQueryRunnable(Set<String> stockCodeSet) {
         this.querySet=stockCodeSet;
-        this.stockService = SpringUtil.getBean(IStockService.class);
-        this.stockListService = SpringUtil.getBean(IStockListService.class);
+        this.stockService = BaseServiceLocator.getBean(IStockService.class);
+        this.stockListService = BaseServiceLocator.getBean(IStockListService.class);
     }
 
     @Override
