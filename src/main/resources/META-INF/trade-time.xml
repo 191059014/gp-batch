@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <!-- 排除周六和周日的日历。 -->
+    <bean id="excludeWeekendsCalendar" class="org.quartz.impl.calendar.WeeklyCalendar" />
+
+    <!-- 排除法定节假日的日历。 -->
+    <bean id="tradeDayCalendar" class="com.hb.batch.scheduler.SelfDayCalendar">
+        <constructor-arg ref="excludeWeekendsCalendar" />
+        <constructor-arg value="${tradeDays.legalHolidays}" />
+    </bean>
+
+    <!-- 上午9:30到11:30的交易时间 -->
+    <bean id="tradeTimeAMCalendar" class="org.quartz.impl.calendar.DailyCalendar">
+        <constructor-arg ref="tradeDayCalendar" />
+        <constructor-arg value="09:25" type="java.lang.String" />
+        <constructor-arg value="11:35" type="java.lang.String" />
+        <!-- include hours between start and end -->
+        <property name="invertTimeRange" value="true" />
+    </bean>
+
+    <!-- 下午13:00到15:00的交易时间 -->
+    <bean id="tradeTimePMCalendar" class="org.quartz.impl.calendar.DailyCalendar">
+        <constructor-arg ref="tradeDayCalendar" />
+        <constructor-arg value="12:55" type="java.lang.String" />
+        <constructor-arg value="16:05" type="java.lang.String" />
+        <!-- include hours between start and end -->
+        <property name="invertTimeRange" value="true" />
+    </bean>
+
+</beans>
+

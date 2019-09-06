@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+    <bean id="orderTaskJobDetail"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject" ref="orderTask" />
+        <property name="targetMethod" value="execute" />
+    </bean>
+
+    <!-- 配置上午监控上交所的任务触发器。 -->
+    <bean id="orderTaskAMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="orderTaskJobDetail" />
+        <property name="cronExpression" value="0/5 * * * * ?"></property>
+        <property name="calendarName" value="tradeTimeAMCalendar"></property>
+    </bean>
+
+    <!-- 配置下午监控上交所的任务触发器。 -->
+    <bean id="orderTaskPMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="orderTaskJobDetail" />
+        <property name="cronExpression" value="0/5 * * * * ?"></property>
+        <property name="calendarName" value="tradeTimePMCalendar"></property>
+    </bean>
+
+    <!-- 上午和下午交易时间监控上交股票行情信息的任务调度。 -->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="calendars">
+            <map>
+                <entry key="tradeTimeAMCalendar" value-ref="tradeTimeAMCalendar"/>
+                <entry key="tradeTimePMCalendar" value-ref="tradeTimePMCalendar"/>
+            </map>
+        </property>
+        <property name="triggers">
+            <list>
+                <ref bean="orderTaskAMTrigger"/>
+                <ref bean="orderTaskPMTrigger" />
+            </list>
+        </property>
+    </bean>
+
+    <import resource="trade-time.xml"/>
+
+</beans>
+

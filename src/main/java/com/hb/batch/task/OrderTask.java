@@ -1,17 +1,14 @@
 package com.hb.batch.task;
 
-import com.hb.batch.runable.OrderQueryRunnable;
-import com.hb.batch.scheduler.ITaskScheduler;
+import com.hb.batch.service.IOrderService;
 import com.hb.facade.entity.OrderDO;
+import com.hb.facade.enumutil.OrderStatusEnum;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.DateUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -24,12 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * @version com.hb.batch.task.OrderQueryTask.java, v1.0
  * @date 2019年08月28日 11时36分
  */
-@Component
-public class OrderQueryTask implements InitializingBean {
+@Component("orderTask")
+public class OrderTask {
     /**
      * the common log
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrderQueryTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrderTask.class);
     /**
      * 最后一次查询时间
      */
@@ -40,46 +37,24 @@ public class OrderQueryTask implements InitializingBean {
     private static volatile Map<String, OrderDO> orderMap = new ConcurrentHashMap<>();
 
     @Autowired
-    @Qualifier("orderQueryTaskScheduler")
-    private ThreadPoolTaskScheduler orderQueryTaskScheduler;
-
-    @Value("${orderQueryTask.cron.default}")
-    private String defaultCron;
+    private StockTask stockTask;
 
     @Autowired
-    private ITaskScheduler iTaskScheduler;
+    private IOrderService orderService;
 
-    @Autowired
-    private StockQueryTask stockQueryTask;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-
-    }
-
-    /**
-     * ########## 加载待处理的订单 ##########
-     */
-    public void loadPendingOrders() {
-        Runnable runnable = new OrderQueryRunnable();
-        orderQueryTaskScheduler.execute(runnable);
-    }
-
-    /**
-     * 开始任务
-     */
-    public void startTask() {
-        Runnable runnable = new OrderQueryRunnable();
-        iTaskScheduler.start(defaultCron, runnable, getTaskId(), orderQueryTaskScheduler);
-    }
-
-    /**
-     * 获取任务ID
-     *
-     * @return 任务ID
-     */
-    private String getTaskId() {
-        return "orderQueryTask_" + System.currentTimeMillis();
+    public void execute() {
+        Date lastQueryDate = null;
+        if (lastQueryTime != null) {
+            lastQueryDate = new Date(lastQueryTime);
+        }
+        lastQueryTime = System.currentTimeMillis();
+        Set<Integer> orderStatuSet = new HashSet<>();
+        orderStatuSet.add(OrderStatusEnum.IN_THE_POSITION.getValue());
+        List<OrderDO> orderList = orderService.getOrderListByOrderStatusAndTime(orderStatuSet, lastQueryDate);
+        LOGGER.info("日期：{}，查询待处理订单结果：{}", lastQueryDate == null ? "" : DateUtils.date2str(lastQueryDate, DateUtils.FORMAT_MS), orderList.size());
+        if (CollectionUtils.isNotEmpty(orderList)) {
+            flushOrderMap(orderList);
+        }
     }
 
     /**
@@ -97,7 +72,7 @@ public class OrderQueryTask implements InitializingBean {
             stockCodeSet.add(order.getStockCode());
         });
         if (CollectionUtils.isNotEmpty(stockCodeSet)) {
-            stockQueryTask.updateStockInfo(stockCodeSet);
+            stockTask.flush(stockCodeSet);
         }
         LOGGER.info("新增订单到数据池：{}", orderList.size());
     }
@@ -107,7 +82,7 @@ public class OrderQueryTask implements InitializingBean {
      *
      * @return 订单信息集合
      */
-    public static Map<String, List<OrderDO>> getUserOrderMap() {
+    public Map<String, List<OrderDO>> getUserOrderMap() {
         Map<String, List<OrderDO>> userOrderMap = new HashedMap();
         orderMap.values().forEach(orderDO -> {
             String userId = orderDO.getUserId();

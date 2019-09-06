@@ -9,9 +9,6 @@ package com.hb.batch.constant;
  */
 public class BatchConstant {
 
-    /**
-     * 股票查询每页条数
-     */
-    public static final int QUERY_BATCH_COUNT = 20;
+
 
 }

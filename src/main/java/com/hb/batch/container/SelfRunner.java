@@ -1,7 +1,7 @@
 package com.hb.batch.container;
 
-import com.hb.batch.task.OrderQueryTask;
-import com.hb.batch.task.StockQueryTask;
+import com.hb.batch.task.OrderTask;
+import com.hb.batch.task.StockTask;
 import com.hb.batch.task.UserTask;
 import io.swagger.annotations.Api;
 import org.slf4j.Logger;
@@ -26,10 +26,10 @@ public class SelfRunner implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(SelfRunner.class);
 
     @Autowired
-    private OrderQueryTask orderQueryTask;
+    private OrderTask orderTask;
 
     @Autowired
-    private StockQueryTask stockQueryTask;
+    private StockTask stockTask;
 
     @Autowired
     private UserTask userTask;
@@ -40,17 +40,6 @@ public class SelfRunner implements CommandLineRunner {
         System.out.println(" server start complete");
         System.out.println(" you can enjoy yourself");
         System.out.println("========================");
-
-        System.out.println(" 开始订单查询任务");
-        orderQueryTask.loadPendingOrders();
-        orderQueryTask.startTask();
-
-        System.out.println(" 开始股票查询任务");
-        stockQueryTask.startTask();
-
-        System.out.println(" 开始用户任务");
-        userTask.startTask();
-
     }
 
 }
