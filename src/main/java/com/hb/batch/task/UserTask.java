@@ -133,7 +133,7 @@ public class UserTask {
                 BigDecimal stopLossMoney = orderDO.getStopLossMoney();
                 if (BigDecimal.ZERO.compareTo(stopEarnMoney) != 0 && currentPrice.compareTo(stopEarnMoney) >= 0) {
                     // 当前价格>=止盈价格，平仓
-                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】>=止盈价格【" + stopEarnMoney + "】，进行强制平仓";
+                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】>=止盈价格【" + stopEarnMoney + "】，进行强制平仓，请及时处理！";
                     LOGGER.info(message);
                     alarmTools.alert("风控", "订单", "用户订单", message);
                     completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -141,7 +141,7 @@ public class UserTask {
                 }
                 if (BigDecimal.ZERO.compareTo(stopLossMoney) != 0 && currentPrice.compareTo(stopLossMoney) <= 0) {
                     // 当前价格<=止损价格，平仓
-                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】<=止损价格【" + stopLossMoney + "】，进行强制平仓";
+                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】<=止损价格【" + stopLossMoney + "】，进行强制平仓，请及时处理！";
                     LOGGER.info(message);
                     alarmTools.alert("风控", "订单", "用户订单", message);
                     completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -150,7 +150,7 @@ public class UserTask {
                 if (new Date().after(orderDO.getDelayEndTime())) {
                     //  递延到期，平仓
                     String delayEndTime = DateUtils.date2str(orderDO.getDelayEndTime(), DateUtils.DEFAULT_FORMAT);
-                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，递延到期【截止时间：" + delayEndTime + "】，进行强制平仓";
+                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，递延到期【截止时间：" + delayEndTime + "】，进行强制平仓，请及时处理！";
                     LOGGER.info(message);
                     alarmTools.alert("风控", "订单", "用户订单", message);
                     completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -169,7 +169,7 @@ public class UserTask {
                     BigDecimal maxProfit = BigDecimalUtils.multiply(strategyMoney, SystemConfig.getAppJson().getStopMaxPercent());
                     if (totalProfit.compareTo(maxProfit) >= 0) {
                         // 盈利达到最大限度，平仓
-                        String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到盈利阀值【" + totalProfit + "】，进行强制平仓";
+                        String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到盈利阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
                         LOGGER.info(message);
                         alarmTools.alert("风控", "订单", "用户订单", message);
                         completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -181,7 +181,7 @@ public class UserTask {
                     BigDecimal maxProfit = BigDecimalUtils.multiply(strategyMoney, SystemConfig.getAppJson().getStopMinPercent());
                     if (totalProfit.abs().compareTo(maxProfit) >= 0) {
                         // 亏损达到最大限度，平仓
-                        String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到亏损阀值【" + totalProfit + "】，进行强制平仓";
+                        String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到亏损阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
                         LOGGER.info(message);
                         alarmTools.alert("风控", "订单", "用户订单", message);
                         completeOrder(orderDO, stockModel, userDO, agentDO);
