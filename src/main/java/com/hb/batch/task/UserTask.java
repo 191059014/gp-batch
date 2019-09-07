@@ -164,11 +164,13 @@ public class UserTask {
                 if (currentPrice.compareTo(buyPrice) >= 0) {
                     earn = true;
                 }
-                BigDecimal strategyMoney = orderDO.getStrategyMoney();
+                BigDecimal strategyOwnMoney = orderDO.getStrategyOwnMoney();
+                BigDecimal appendMoney = orderDO.getAppendMoney();
+                BigDecimal totalStrategyOwnMoney = BigDecimalUtils.add(strategyOwnMoney, appendMoney);
                 if (earn) {
                     // 盈利
                     BigDecimal totalProfit = StockTools.calcOrderProfit(buyPrice, currentPrice, buyNumber);
-                    BigDecimal maxProfit = BigDecimalUtils.multiply(strategyMoney, SystemConfig.getAppJson().getStopMaxPercent());
+                    BigDecimal maxProfit = BigDecimalUtils.multiply(totalStrategyOwnMoney, SystemConfig.getAppJson().getStopMaxPercent());
                     if (totalProfit.compareTo(maxProfit) >= 0) {
                         // 盈利达到最大限度，平仓
                         String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到盈利阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
@@ -180,7 +182,7 @@ public class UserTask {
                 } else {
                     // 亏损
                     BigDecimal totalProfit = StockTools.calcOrderProfit(buyPrice, currentPrice, buyNumber);
-                    BigDecimal maxProfit = BigDecimalUtils.multiply(strategyMoney, SystemConfig.getAppJson().getStopMinPercent());
+                    BigDecimal maxProfit = BigDecimalUtils.multiply(totalStrategyOwnMoney, SystemConfig.getAppJson().getStopMinPercent());
                     if (totalProfit.abs().compareTo(maxProfit) >= 0) {
                         // 亏损达到最大限度，平仓
                         String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到亏损阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
@@ -227,20 +229,20 @@ public class UserTask {
         // 卖出时间
         orderDO.setSellTime(new Date());
         int backDays = StockTools.calcBackDays(orderDO.getCreateTime(), orderDO.getDelayDays());
-        LOGGER.info(LogUtils.appLog("{}卖出，需要退还的递延金的天数：{}"), LOG_PREFIX, backDays);
+        LOGGER.info(LogUtils.appLog("卖出，需要退还的递延金的天数：{}"), backDays);
         BigDecimal backDelayMoney = BigDecimal.ZERO;
         // 退换的递延天数
         orderDO.setBackDelayDays(backDays);
         if (backDays > 0) {
             // 退还递延金
             backDelayMoney = StockTools.calcDelayMoney(strategyMoney, backDays, SystemConfig.getAppJson().getDelayMoneyPercent());
-            LOGGER.info(LogUtils.appLog("{}卖出，退还递延金：{}"), LOG_PREFIX, backDelayMoney);
+            LOGGER.info(LogUtils.appLog("卖出，退还递延金：{}"), backDelayMoney);
             // 退还的递延金
             orderDO.setBackDelayMoney(backDelayMoney);
             // 递延金
             orderDO.setDelayMoney(BigDecimalUtils.subtract(orderDO.getDelayMoney(), backDelayMoney));
         }
-        LOGGER.info(LogUtils.appLog("{}卖出-更新订单信息：{}"), LOG_PREFIX, orderDO);
+        LOGGER.info(LogUtils.appLog("卖出-更新订单信息：{}"), orderDO);
         orderDO.setUpdateTime(new Date());
         iOrderService.updateByPrimaryKeySelective(orderDO);
 
@@ -256,18 +258,19 @@ public class UserTask {
         // 账户总金额=原账户总金额+利润+退还的递延金
         BigDecimal add = BigDecimalUtils.addAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getAccountTotalMoney(), profit, backDelayMoney);
         customerFund.setAccountTotalMoney(add);
-        // 可用余额=原可用余额+利润+退还的递延金+策略本金
-        customerFund.setUsableMoney(BigDecimalUtils.addAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getUsableMoney(), strategyOwnMoney, profit, backDelayMoney));
-        // 交易冻结金额=原交易冻结金额-策略本金
-        customerFund.setTradeFreezeMoney(BigDecimalUtils.subtract(customerFund.getTradeFreezeMoney(), strategyOwnMoney));
+        // 可用余额=原可用余额+利润+退还的递延金+策略本金+追加的信用金
+        BigDecimal appendMoney = orderDO.getAppendMoney();
+        customerFund.setUsableMoney(BigDecimalUtils.addAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getUsableMoney(), strategyOwnMoney, profit, backDelayMoney, appendMoney));
+        // 交易冻结金额=原交易冻结金额-策略本金-追加的信用金
+        customerFund.setTradeFreezeMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTradeFreezeMoney(), strategyOwnMoney, appendMoney));
         // 总盈亏=原总盈亏+利润
         customerFund.setTotalProfitAndLossMoney(BigDecimalUtils.add(customerFund.getTotalProfitAndLossMoney(), profit));
-        // 累计持仓市值总金额
+        // 累计持仓市值总金额=原累计持仓市值总金额-持仓市值
         customerFund.setTotalStrategyMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyMoney(), strategyMoney));
-        // 累计持仓信用金总金额
-        customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney));
+        // 累计持仓信用金总金额=原累计持仓信用金总金额-持仓信用金-追加的信用金
+        customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney, appendMoney));
         customerFund.setUpdateTime(new Date());
-        LOGGER.info(LogUtils.appLog("{}卖出-更新客户资金信息：{}"), LOG_PREFIX, customerFund);
+        LOGGER.info(LogUtils.appLog("卖出-更新客户资金信息：{}"), customerFund);
         iCustomerFundService.updateByPrimaryKeySelective(customerFund);
 
         /**
@@ -283,7 +286,7 @@ public class UserTask {
             backDelayDetail.setAfterHappenMoney(backDelayMoney);
             backDelayDetail.setFundType(FundTypeEnum.DELAY_BACK.getValue());
             backDelayDetail.setRemark(FundTypeEnum.DELAY_BACK.getDesc());
-            LOGGER.info(LogUtils.appLog("{}卖出-退还递延金流水：{}"), LOG_PREFIX, backDelayDetail);
+            LOGGER.info(LogUtils.appLog("卖出-退还递延金流水：{}"), backDelayDetail);
             iCustomerFundDetailService.addOne(backDelayDetail);
         }
         orderTask.removeOrder(orderDO.getOrderId());

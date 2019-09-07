@@ -48,13 +48,23 @@ public class OrderTask {
             lastQueryDate = new Date(lastQueryTime);
         }
         lastQueryTime = System.currentTimeMillis();
-        Set<Integer> orderStatuSet = new HashSet<>();
-        orderStatuSet.add(OrderStatusEnum.IN_THE_POSITION.getValue());
-        List<OrderDO> orderList = orderService.getOrderListByOrderStatusAndTime(orderStatuSet, lastQueryDate);
+        List<OrderDO> orderList = getPendingOrderList(lastQueryDate);
         LOGGER.info("{}最后一次查询时间：{}，查询待处理订单结果：{}", LOG_PREFIX, lastQueryDate == null ? "" : DateUtils.date2str(lastQueryDate, DateUtils.FORMAT_MS), orderList.size());
         if (CollectionUtils.isNotEmpty(orderList)) {
             flushOrderMap(orderList);
         }
+    }
+
+    /**
+     * 查询待处理（持仓中）的订单
+     *
+     * @param lastQueryDate 查询时间
+     * @return 待处理订单
+     */
+    public List<OrderDO> getPendingOrderList(Date lastQueryDate) {
+        Set<Integer> orderStatuSet = new HashSet<>();
+        orderStatuSet.add(OrderStatusEnum.IN_THE_POSITION.getValue());
+        return orderService.getOrderListByOrderStatusAndTime(orderStatuSet, lastQueryDate);
     }
 
     /**
