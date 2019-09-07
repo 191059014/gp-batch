@@ -20,6 +20,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -206,7 +208,8 @@ public class UserTask {
      * @param user       用户信息
      * @param agent      代理商信息
      */
-    private void completeOrder(OrderDO orderDO, StockModel stockModel, UserDO user, AgentDO agent) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    public void completeOrder(OrderDO orderDO, StockModel stockModel, UserDO user, AgentDO agent) {
         String userId = user.getUserId();
         String userName = user.getUserName();
         BigDecimal strategyMoney = orderDO.getStrategyMoney();
