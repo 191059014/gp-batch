@@ -72,6 +72,7 @@ public class UserTask {
      */
     public void execute() {
         Map<String, List<OrderDO>> userOrderMap = orderTask.getUserOrderMap();
+        LOGGER.info("风险控制批处理，共需处理的任务数：{}", userOrderMap.size());
         userOrderMap.forEach((userId, orderList) -> {
             UserDO userDO = redisCacheManage.getUserCache(userId);
             if (userDO == null) {
@@ -95,7 +96,7 @@ public class UserTask {
      * 监控用户下的订单
      *
      * @param userDO    用户ID
-     * @param agentDO
+     * @param agentDO   代理商信息
      * @param orderList 订单集合
      */
     public void monitorUser(UserDO userDO, AgentDO agentDO, List<OrderDO> orderList) {
