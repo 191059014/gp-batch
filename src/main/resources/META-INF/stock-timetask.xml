@@ -17,14 +17,14 @@
     <!-- 配置上午监控上交所的任务触发器。 -->
     <bean id="stockTaskAMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="stockTaskJobDetail" />
-        <property name="cronExpression" value="0/3 * * * * ?"></property>
+        <property name="cronExpression" value="0/2 * * * * ?"></property>
         <property name="calendarName" value="tradeTimeAMCalendar"></property>
     </bean>
 
     <!-- 配置下午监控上交所的任务触发器。 -->
     <bean id="stockTaskPMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="stockTaskJobDetail" />
-        <property name="cronExpression" value="0/3 * * * * ?"></property>
+        <property name="cronExpression" value="0/2 * * * * ?"></property>
         <property name="calendarName" value="tradeTimePMCalendar"></property>
     </bean>
 

@@ -21,12 +21,13 @@
         <!-- 设置日志名称 -->
         <file>${logging.path}/gp-batch-common.log</file>
         <!-- 使用滚动策略 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 日志文件输出的文件名-->
-            <FileNamePattern>${logging.path}/gp-batch-common.%d{yyyy-MM-dd}.log
-            </FileNamePattern>
+            <fileNamePattern>${logging.path}/gp-batch-common.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 日志文件保留天数-->
-            <MaxHistory>7</MaxHistory>
+            <maxHistory>7</maxHistory>
+            <!-- 日志文件保留天数-->
+            <maxFileSize>10MB</maxFileSize>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--日志输出格式-->
@@ -36,10 +37,6 @@
             <!-- 编码 -->
             <charset>UTF-8</charset>
         </encoder>
-        <!--日志文件最大的大小-->
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>10MB</MaxFileSize>
-        </triggeringPolicy>
     </appender>
 
     <!-- 按照每天生成错误级别的日志文件 -->
@@ -54,12 +51,13 @@
         <!-- 设置日志名称 -->
         <file>${logging.path}/gp-batch-error.log</file>
         <!-- 使用滚动策略 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 日志文件输出的文件名-->
-            <FileNamePattern>${logging.path}/gp-batch-error.%d{yyyy-MM-dd}.log
-            </FileNamePattern>
+            <fileNamePattern>${logging.path}/gp-batch-error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 日志文件保留天数-->
-            <MaxHistory>7</MaxHistory>
+            <maxHistory>7</maxHistory>
+            <!-- 日志文件保留天数-->
+            <maxFileSize>5MB</maxFileSize>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--日志输出格式-->
@@ -69,10 +67,6 @@
             <!-- 编码 -->
             <charset>UTF-8</charset>
         </encoder>
-        <!--日志文件最大的大小-->
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>10MB</MaxFileSize>
-        </triggeringPolicy>
     </appender>
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
