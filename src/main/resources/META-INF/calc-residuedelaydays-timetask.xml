@@ -17,7 +17,7 @@
     <!-- 每个交易日上午8:00计算剩余递延天数的任务触发器。 -->
     <bean id="calcResidueDelayDaysTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="calcResidueDelayDaysJobDetail"/>
-        <property name="cronExpression" value="0 33 18 * * ?"></property>
+        <property name="cronExpression" value="0 0 7 * * ?"></property>
         <property name="calendarName" value="tradeDayCalendar"></property>
     </bean>
 
