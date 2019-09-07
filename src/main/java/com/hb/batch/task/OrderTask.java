@@ -98,4 +98,13 @@ public class OrderTask {
         return userOrderMap;
     }
 
+    /**
+     * 删除待处理订单
+     *
+     * @param orderId 订单ID
+     */
+    public void removeOrder(String orderId) {
+        orderMap.remove(orderId);
+    }
+
 }

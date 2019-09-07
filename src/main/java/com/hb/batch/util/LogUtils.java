@@ -12,7 +12,7 @@ import java.io.StringWriter;
  */
 public class LogUtils {
 
-    private static final String APP_PREFIX = "【APP】";
+    private static final String APP_PREFIX = "【风控后台】";
 
     /**
      * ########## app打印日志拼接信息 ##########

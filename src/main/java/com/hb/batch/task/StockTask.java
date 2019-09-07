@@ -48,13 +48,14 @@ public class StockTask {
      *
      * @param stockCode 股票代码
      */
-    public void flushOne(String stockCode) {
+    public StockModel flushOne(String stockCode) {
         if (StringUtils.isBlank(stockCode)) {
-            return;
+            return null;
         }
         Set<String> querySet = new HashSet<>();
         querySet.add(stockCode);
-        flush(querySet);
+        List<StockModel> stockModelList = flush(querySet);
+        return CollectionUtils.isEmpty(stockModelList) ? null : stockModelList.get(0);
     }
 
     /**
@@ -62,7 +63,7 @@ public class StockTask {
      *
      * @param querySet 股票代码集合
      */
-    public void flush(Set<String> querySet) {
+    public List<StockModel> flush(Set<String> querySet) {
         LOGGER.info("当前线程：{}", Thread.currentThread().getName());
         List<StockListDO> stockListDOList = stockListService.getStockListBySet(querySet);
         List<String> stockCodeList = new ArrayList<>();
@@ -71,21 +72,25 @@ public class StockTask {
         }
         int total = stockCodeList.size();
         int i = 1;
+        List<StockModel> resultList = new ArrayList<>();
         while (true) {
             if (total > i * BATCH_COUNT) {
                 List<String> subList = stockCodeList.subList((i - 1) * BATCH_COUNT, i * BATCH_COUNT);
                 Set<String> subSet = new HashSet<>(subList);
                 List<StockModel> stockModelList = stockService.queryStockList(subSet);
                 updateStockMap(stockModelList);
+                resultList.addAll(stockModelList);
             } else {
-                List<String> subList = stockCodeList.subList((i - 1) * BATCH_COUNT, stockCodeList.size() - 1);
+                List<String> subList = stockCodeList.subList((i - 1) * BATCH_COUNT, stockCodeList.size());
                 Set<String> subSet = new HashSet<>(subList);
                 List<StockModel> stockModelList = stockService.queryStockList(subSet);
                 updateStockMap(stockModelList);
+                resultList.addAll(stockModelList);
                 break;
             }
             i++;
         }
+        return resultList;
     }
 
     /**
@@ -99,7 +104,7 @@ public class StockTask {
             return;
         }
         stockModelList.forEach(stock -> {
-            stock.setLastUpdateTime(new Date());
+            stock.setLastUpdateTime(System.currentTimeMillis());
             stockMap.put(stock.getStockCode(), stock);
         });
     }
