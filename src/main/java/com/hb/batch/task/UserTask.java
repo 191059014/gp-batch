@@ -2,6 +2,7 @@ package com.hb.batch.task;
 
 import com.hb.batch.service.*;
 import com.hb.batch.util.LogUtils;
+import com.hb.batch.util.StockUtils;
 import com.hb.facade.calc.StockTools;
 import com.hb.facade.common.SystemConfig;
 import com.hb.facade.entity.*;
@@ -67,12 +68,15 @@ public class UserTask {
     @Value("${stock.valid.timeInterval}")
     private Double stockValidTimeInterval;
 
+    private static final String LOG_PREFIX = "【UserTask】";
+
     /**
      * 用户定时任务
      */
     public void execute() {
+        LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
         Map<String, List<OrderDO>> userOrderMap = orderTask.getUserOrderMap();
-        LOGGER.info("风险控制批处理，共需处理的任务数：{}", userOrderMap.size());
+        LOGGER.info("{}风险控制批处理，共需处理的任务数：{}", LOG_PREFIX, userOrderMap.size());
         userOrderMap.forEach((userId, orderList) -> {
             UserDO userDO = redisCacheManage.getUserCache(userId);
             if (userDO == null) {
@@ -100,7 +104,7 @@ public class UserTask {
      * @param orderList 订单集合
      */
     public void monitorUser(UserDO userDO, AgentDO agentDO, List<OrderDO> orderList) {
-        LOGGER.info("用户ID：{}，风险控制开始，共需处理的订单个数：{}", userDO, orderList.size());
+        LOGGER.info("{}用户ID：{}，风险控制开始，共需处理的订单个数：{}", LOG_PREFIX, userDO, orderList.size());
         if (CollectionUtils.isEmpty(orderList)) {
             return;
         }
@@ -111,19 +115,16 @@ public class UserTask {
             String orderId = orderDO.getOrderId();
             String stockCode = orderDO.getStockCode();
             try {
-                LOGGER.info("订单号：{}，股票代码：{}，风险控制开始", orderId, stockCode);
+                LOGGER.info("{}订单号：{}，股票代码：{}，风险控制开始", LOG_PREFIX, orderId, stockCode);
                 StockModel stockModel = stockTask.getStock(stockCode);
                 if (stockModel == null) {
                     stockModel = stockTask.flushOne(stockCode);
                     if (stockModel == null) {
-                        LOGGER.error("查询不到股票：{}的行情信息！", stockCode);
+                        LOGGER.error("{}查询不到股票：{}的行情信息！", LOG_PREFIX, stockCode);
                     }
                 }
-                long lastUpdateTime = stockModel.getLastUpdateTime();
-                long nowTime = System.currentTimeMillis();
-                Double timeInterval = (Double.parseDouble((nowTime - lastUpdateTime) + "")) / 1000;
-                if (timeInterval.compareTo(stockValidTimeInterval) > 0) {
-                    LOGGER.info("股票{}行情刷新，间隔{}大于有效期", stockCode, timeInterval);
+                if (StockUtils.isExpire(stockModel.getLastUpdateTime(), stockValidTimeInterval)) {
+                    LOGGER.info("{}股票{}行情刷新，间隔大于有效期", LOG_PREFIX, stockCode);
                     stockModel = stockTask.flushOne(stockCode);
                 }
                 // 当前价格
@@ -134,7 +135,7 @@ public class UserTask {
                 BigDecimal stopLossMoney = orderDO.getStopLossMoney();
                 if (BigDecimal.ZERO.compareTo(stopEarnMoney) != 0 && currentPrice.compareTo(stopEarnMoney) >= 0) {
                     // 当前价格>=止盈价格，平仓
-                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】>=止盈价格【" + stopEarnMoney + "】，进行强制平仓，请及时处理！";
+                    String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】>=止盈价格【" + stopEarnMoney + "】，进行强制平仓，请及时处理！";
                     LOGGER.info(message);
                     alarmTools.alert("风控", "订单", "用户订单", message);
                     completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -142,7 +143,7 @@ public class UserTask {
                 }
                 if (BigDecimal.ZERO.compareTo(stopLossMoney) != 0 && currentPrice.compareTo(stopLossMoney) <= 0) {
                     // 当前价格<=止损价格，平仓
-                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】<=止损价格【" + stopLossMoney + "】，进行强制平仓，请及时处理！";
+                    String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】<=止损价格【" + stopLossMoney + "】，进行强制平仓，请及时处理！";
                     LOGGER.info(message);
                     alarmTools.alert("风控", "订单", "用户订单", message);
                     completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -151,7 +152,7 @@ public class UserTask {
                 if (new Date().after(orderDO.getDelayEndTime())) {
                     //  递延到期，平仓
                     String delayEndTime = DateUtils.date2str(orderDO.getDelayEndTime(), DateUtils.DEFAULT_FORMAT);
-                    String message = "用户【" + userName + "】，订单号【" + orderId + "】，递延到期【截止时间：" + delayEndTime + "】，进行强制平仓，请及时处理！";
+                    String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，递延到期【截止时间：" + delayEndTime + "】，进行强制平仓，请及时处理！";
                     LOGGER.info(message);
                     alarmTools.alert("风控", "订单", "用户订单", message);
                     completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -170,7 +171,7 @@ public class UserTask {
                     BigDecimal maxProfit = BigDecimalUtils.multiply(strategyMoney, SystemConfig.getAppJson().getStopMaxPercent());
                     if (totalProfit.compareTo(maxProfit) >= 0) {
                         // 盈利达到最大限度，平仓
-                        String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到盈利阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
+                        String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到盈利阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
                         LOGGER.info(message);
                         alarmTools.alert("风控", "订单", "用户订单", message);
                         completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -182,7 +183,7 @@ public class UserTask {
                     BigDecimal maxProfit = BigDecimalUtils.multiply(strategyMoney, SystemConfig.getAppJson().getStopMinPercent());
                     if (totalProfit.abs().compareTo(maxProfit) >= 0) {
                         // 亏损达到最大限度，平仓
-                        String message = "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到亏损阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
+                        String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到亏损阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
                         LOGGER.info(message);
                         alarmTools.alert("风控", "订单", "用户订单", message);
                         completeOrder(orderDO, stockModel, userDO, agentDO);
@@ -190,7 +191,7 @@ public class UserTask {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error("用户：{}，订单号：{}，风控过程中出现异常：{}", userName, orderId, LogHelper.getStackTrace(e));
+                LOGGER.error("{}用户：{}，订单号：{}，风控过程中出现异常：{}", LOG_PREFIX, userName, orderId, LogHelper.getStackTrace(e));
             }
         }
     }
@@ -226,20 +227,20 @@ public class UserTask {
         // 卖出时间
         orderDO.setSellTime(new Date());
         int backDays = StockTools.calcBackDays(orderDO.getCreateTime(), orderDO.getDelayDays());
-        LOGGER.info(LogUtils.appLog("卖出，需要退还的递延金的天数：{}"), backDays);
+        LOGGER.info(LogUtils.appLog("{}卖出，需要退还的递延金的天数：{}"), LOG_PREFIX, backDays);
         BigDecimal backDelayMoney = BigDecimal.ZERO;
         // 退换的递延天数
         orderDO.setBackDelayDays(backDays);
         if (backDays > 0) {
             // 退还递延金
             backDelayMoney = StockTools.calcDelayMoney(strategyMoney, backDays, SystemConfig.getAppJson().getDelayMoneyPercent());
-            LOGGER.info(LogUtils.appLog("卖出，退还递延金：{}"), backDelayMoney);
+            LOGGER.info(LogUtils.appLog("{}卖出，退还递延金：{}"), LOG_PREFIX, backDelayMoney);
             // 退还的递延金
             orderDO.setBackDelayMoney(backDelayMoney);
             // 递延金
             orderDO.setDelayMoney(BigDecimalUtils.subtract(orderDO.getDelayMoney(), backDelayMoney));
         }
-        LOGGER.info(LogUtils.appLog("卖出-更新订单信息：{}"), orderDO);
+        LOGGER.info(LogUtils.appLog("{}卖出-更新订单信息：{}"), LOG_PREFIX, orderDO);
         orderDO.setUpdateTime(new Date());
         iOrderService.updateByPrimaryKeySelective(orderDO);
 
@@ -266,7 +267,7 @@ public class UserTask {
         // 累计持仓信用金总金额
         customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney));
         customerFund.setUpdateTime(new Date());
-        LOGGER.info(LogUtils.appLog("卖出-更新客户资金信息：{}"), customerFund);
+        LOGGER.info(LogUtils.appLog("{}卖出-更新客户资金信息：{}"), LOG_PREFIX, customerFund);
         iCustomerFundService.updateByPrimaryKeySelective(customerFund);
 
         /**
@@ -282,7 +283,7 @@ public class UserTask {
             backDelayDetail.setAfterHappenMoney(backDelayMoney);
             backDelayDetail.setFundType(FundTypeEnum.DELAY_BACK.getValue());
             backDelayDetail.setRemark(FundTypeEnum.DELAY_BACK.getDesc());
-            LOGGER.info(LogUtils.appLog("卖出-退还递延金流水：{}"), backDelayDetail);
+            LOGGER.info(LogUtils.appLog("{}卖出-退还递延金流水：{}"), LOG_PREFIX, backDelayDetail);
             iCustomerFundDetailService.addOne(backDelayDetail);
         }
         orderTask.removeOrder(orderDO.getOrderId());

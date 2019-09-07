@@ -19,8 +19,8 @@
     <!-- 上午9:30到11:30的交易时间 -->
     <bean id="tradeTimeAMCalendar" class="org.quartz.impl.calendar.DailyCalendar">
         <constructor-arg ref="tradeDayCalendar" />
-        <constructor-arg value="09:25" type="java.lang.String" />
-        <constructor-arg value="11:35" type="java.lang.String" />
+        <constructor-arg value="08:00" type="java.lang.String" />
+        <constructor-arg value="12:35" type="java.lang.String" />
         <!-- include hours between start and end -->
         <property name="invertTimeRange" value="true" />
     </bean>
@@ -29,7 +29,7 @@
     <bean id="tradeTimePMCalendar" class="org.quartz.impl.calendar.DailyCalendar">
         <constructor-arg ref="tradeDayCalendar" />
         <constructor-arg value="12:55" type="java.lang.String" />
-        <constructor-arg value="16:05" type="java.lang.String" />
+        <constructor-arg value="23:05" type="java.lang.String" />
         <!-- include hours between start and end -->
         <property name="invertTimeRange" value="true" />
     </bean>

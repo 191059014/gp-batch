@@ -36,13 +36,13 @@ public class OrderTask {
      */
     private static volatile Map<String, OrderDO> orderMap = new ConcurrentHashMap<>();
 
-    @Autowired
-    private StockTask stockTask;
+    private static final String LOG_PREFIX = "【OrderTask】";
 
     @Autowired
     private IOrderService orderService;
 
     public void execute() {
+        LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
         Date lastQueryDate = null;
         if (lastQueryTime != null) {
             lastQueryDate = new Date(lastQueryTime);
@@ -51,7 +51,7 @@ public class OrderTask {
         Set<Integer> orderStatuSet = new HashSet<>();
         orderStatuSet.add(OrderStatusEnum.IN_THE_POSITION.getValue());
         List<OrderDO> orderList = orderService.getOrderListByOrderStatusAndTime(orderStatuSet, lastQueryDate);
-        LOGGER.info("日期：{}，查询待处理订单结果：{}", lastQueryDate == null ? "" : DateUtils.date2str(lastQueryDate, DateUtils.FORMAT_MS), orderList.size());
+        LOGGER.info("{}最后一次查询时间：{}，查询待处理订单结果：{}", LOG_PREFIX, lastQueryDate == null ? "" : DateUtils.date2str(lastQueryDate, DateUtils.FORMAT_MS), orderList.size());
         if (CollectionUtils.isNotEmpty(orderList)) {
             flushOrderMap(orderList);
         }
@@ -66,15 +66,10 @@ public class OrderTask {
         if (CollectionUtils.isEmpty(orderList)) {
             return;
         }
-        Set<String> stockCodeSet = new HashSet<>();
         orderList.forEach(order -> {
             orderMap.put(order.getOrderId(), order);
-            stockCodeSet.add(order.getStockCode());
         });
-        if (CollectionUtils.isNotEmpty(stockCodeSet)) {
-            stockTask.flush(stockCodeSet);
-        }
-        LOGGER.info("新增订单到数据池：{}", orderList.size());
+        LOGGER.info("{}新增订单到数据池：{}", LOG_PREFIX, orderList.size());
     }
 
     /**
@@ -104,7 +99,20 @@ public class OrderTask {
      * @param orderId 订单ID
      */
     public void removeOrder(String orderId) {
+        LOGGER.info("{}删除订单：{}", LOG_PREFIX, orderId);
         orderMap.remove(orderId);
+    }
+
+    /**
+     * 获取股票代码集合
+     *
+     * @return 股票代码集合
+     */
+    public Set<String> getStockCodeSet() {
+        Set<String> stockCodeSet = new HashSet<>();
+        orderMap.values().forEach(orderDO -> stockCodeSet.add(orderDO.getStockCode()));
+        LOGGER.info("{}获取股票代码集合：{}", LOG_PREFIX, stockCodeSet);
+        return stockCodeSet;
     }
 
 }

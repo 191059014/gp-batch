@@ -12,7 +12,7 @@
     <import resource="classpath*:config/service-*-context.xml"/>
 
     <import resource="order-timetask.xml"/>
-
+    <import resource="stock-timetask.xml"/>
     <import resource="user-timetask.xml"/>
 
     <!-- mapper -->

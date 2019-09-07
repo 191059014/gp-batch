@@ -7,23 +7,24 @@
 	http://www.springframework.org/schema/context
 	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-    <!-- 用户订单定时任务。 -->
-    <bean id="userTaskJobDetail"
+    <!-- 股票行情数据刷新定时任务。 -->
+    <bean id="stockTaskJobDetail"
           class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
-        <property name="targetObject" ref="userTask" />
+        <property name="targetObject" ref="stockTask" />
         <property name="targetMethod" value="execute" />
     </bean>
 
     <!-- 配置上午监控上交所的任务触发器。 -->
-    <bean id="userTaskAMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="userTaskJobDetail" />
-        <property name="cronExpression" value="0/1 * * * * ?"></property>
+    <bean id="stockTaskAMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="stockTaskJobDetail" />
+        <property name="cronExpression" value="0/3 * * * * ?"></property>
         <property name="calendarName" value="tradeTimeAMCalendar"></property>
     </bean>
+
     <!-- 配置下午监控上交所的任务触发器。 -->
-    <bean id="userTaskPMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
-        <property name="jobDetail" ref="userTaskJobDetail" />
-        <property name="cronExpression" value="0/1 * * * * ?"></property>
+    <bean id="stockTaskPMTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="stockTaskJobDetail" />
+        <property name="cronExpression" value="0/3 * * * * ?"></property>
         <property name="calendarName" value="tradeTimePMCalendar"></property>
     </bean>
 
@@ -37,8 +38,8 @@
         </property>
         <property name="triggers">
             <list>
-                <ref bean="userTaskAMTrigger"/>
-                <ref bean="userTaskPMTrigger" />
+                <ref bean="stockTaskAMTrigger"/>
+                <ref bean="stockTaskPMTrigger" />
             </list>
         </property>
     </bean>
