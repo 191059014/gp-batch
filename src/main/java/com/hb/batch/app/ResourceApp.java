@@ -61,6 +61,9 @@ public class ResourceApp extends BaseApp {
         List<StockModel> stockModels = null;
         try {
             List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockQueryRequestVO.getStockCodeSet());
+            if (stockListDOList == null) {
+                return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS);
+            }
             Set<String> fullCodeList = new HashSet<>();
             for (StockListDO stockListDO : stockListDOList) {
                 fullCodeList.add(stockListDO.getFull_code());
