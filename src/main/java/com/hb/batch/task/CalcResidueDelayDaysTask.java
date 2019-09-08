@@ -6,6 +6,7 @@ import com.hb.facade.entity.OrderDO;
 import com.hb.remote.tool.AlarmTools;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.DateUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -58,7 +59,7 @@ public class CalcResidueDelayDaysTask {
             OrderDO update = new OrderDO(orderId);
             update.setResidueDelayDays(residueDelayDays);
             iOrderService.updateByPrimaryKeySelective(update);
-            alarmTools.alert("风控", "订单", "计算订单剩余递延天数", "订单【" + orderId + "】剩余递延天数：" + residueDelayDays + "天");
+            alarmTools.alert("风控", "订单", "计算订单剩余递延天数", "用户【" + orderDO.getUserName() + "】，订单【" + orderId + "】剩余递延天数：" + residueDelayDays + "天，递延到期时间：" + DateUtils.date2str(orderDO.getDelayEndTime(), DateUtils.DEFAULT_FORMAT));
         } catch (Exception e) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.info("订单【{}】订单剩余递延天数异常，请及时处理！【{}】", orderId, e.getMessage());
