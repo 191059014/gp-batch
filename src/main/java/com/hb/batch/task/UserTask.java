@@ -171,8 +171,6 @@ public class UserTask {
                 }
                 BigDecimal strategyOwnMoney = orderDO.getStrategyOwnMoney();
                 BigDecimal strategyMoney = orderDO.getStrategyMoney();
-                BigDecimal appendMoney = orderDO.getAppendMoney();
-                BigDecimal totalStrategyOwnMoney = BigDecimalUtils.add(strategyOwnMoney, appendMoney);
                 if (earn) {
                     // 盈利
                     BigDecimal totalProfit = StockTools.calcOrderProfit(buyPrice, currentPrice, buyNumber);
@@ -188,7 +186,7 @@ public class UserTask {
                 } else {
                     // 亏损
                     BigDecimal totalProfit = StockTools.calcOrderProfit(buyPrice, currentPrice, buyNumber);
-                    BigDecimal maxProfit = BigDecimalUtils.multiply(totalStrategyOwnMoney, SystemConfig.getAppJson().getStopMinPercent());
+                    BigDecimal maxProfit = BigDecimalUtils.multiply(strategyOwnMoney, SystemConfig.getAppJson().getStopMinPercent());
                     if (totalProfit.abs().compareTo(maxProfit) >= 0) {
                         // 亏损达到最大限度，平仓
                         String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到亏损阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";
@@ -267,17 +265,16 @@ public class UserTask {
         // 账户总金额=原账户总金额+利润+退还的递延金
         BigDecimal add = BigDecimalUtils.addAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getAccountTotalMoney(), profit, backDelayMoney);
         customerFund.setAccountTotalMoney(add);
-        // 可用余额=原可用余额+利润+退还的递延金+策略本金+追加的信用金
-        BigDecimal appendMoney = orderDO.getAppendMoney();
-        customerFund.setUsableMoney(BigDecimalUtils.addAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getUsableMoney(), strategyOwnMoney, profit, backDelayMoney, appendMoney));
-        // 交易冻结金额=原交易冻结金额-策略本金-追加的信用金
-        customerFund.setTradeFreezeMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTradeFreezeMoney(), strategyOwnMoney, appendMoney));
+        // 可用余额=原可用余额+利润+退还的递延金+策略本金
+        customerFund.setUsableMoney(BigDecimalUtils.addAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getUsableMoney(), strategyOwnMoney, profit, backDelayMoney));
+        // 交易冻结金额=原交易冻结金额-策略本金
+        customerFund.setTradeFreezeMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTradeFreezeMoney(), strategyOwnMoney));
         // 总盈亏=原总盈亏+利润
         customerFund.setTotalProfitAndLossMoney(BigDecimalUtils.add(customerFund.getTotalProfitAndLossMoney(), profit));
         // 累计持仓市值总金额=原累计持仓市值总金额-持仓市值
         customerFund.setTotalStrategyMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyMoney(), strategyMoney));
-        // 累计持仓信用金总金额=原累计持仓信用金总金额-持仓信用金-追加的信用金
-        customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney, appendMoney));
+        // 累计持仓信用金总金额=原累计持仓信用金总金额-持仓信用金
+        customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney));
         customerFund.setUpdateTime(new Date());
         LOGGER.info(LogUtils.appLog("卖出-更新客户资金信息：{}"), customerFund);
         iCustomerFundService.updateByPrimaryKeySelective(customerFund);
