@@ -131,6 +131,10 @@ public class UserTask {
                 }
                 // 当前价格
                 BigDecimal currentPrice = stockModel.getCurrentPrice();
+                if (BigDecimal.ZERO.compareTo(currentPrice) == 0) {
+                    // 防止网络波动，查询出来的行情不正确
+                    continue;
+                }
                 // 止盈价格
                 BigDecimal stopEarnMoney = orderDO.getStopEarnMoney();
                 // 止损价格
