@@ -78,7 +78,6 @@ public class UserTask {
     public void execute() {
         LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
         Map<String, List<OrderDO>> userOrderMap = orderTask.getUserOrderMap();
-        LOGGER.info("{}风险控制批处理，共需处理的任务数：{}", LOG_PREFIX, userOrderMap.size());
         userOrderMap.forEach((userId, orderList) -> {
             UserDO userDO = redisCacheManage.getUserCache(userId);
             if (userDO == null) {
@@ -106,7 +105,7 @@ public class UserTask {
      * @param orderList 订单集合
      */
     public void monitorUser(UserDO userDO, AgentDO agentDO, List<OrderDO> orderList) {
-        LOGGER.info("{}用户ID：{}，风险控制开始，共需处理的订单个数：{}", LOG_PREFIX, userDO, orderList.size());
+        LOGGER.info("{}用户：{}，风险控制开始，共需处理的订单个数：{}", LOG_PREFIX, userDO.getUserName(), orderList.size());
         if (CollectionUtils.isEmpty(orderList)) {
             return;
         }
