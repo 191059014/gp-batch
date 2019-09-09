@@ -158,7 +158,7 @@ public class StockTask {
                 BigDecimal changeValue = BigDecimalUtils.subtract(currentPrice, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE);
                 double changePercent = BigDecimalUtils.divide(changeValue, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE).doubleValue();
                 if (changePercent >= upStopPercent || changePercent <= lowStopPercent) {
-                    LOGGER.info("{}股票{}涨停或者跌停!", LOG_PREFIX, stock.getStockCode());
+                    LOGGER.info("{}股票{}涨停或者跌停，昨日收盘价：{}，当前价：{}", LOG_PREFIX, stock.getStockCode(), yesterdayClosePrice, currentPrice);
                     redisCacheManage.setUpOrLowerStopStockCache(stock.getStockCode());
                 }
             }
