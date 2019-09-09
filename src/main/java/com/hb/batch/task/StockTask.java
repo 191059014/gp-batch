@@ -157,6 +157,7 @@ public class StockTask {
             BigDecimal changeValue = BigDecimalUtils.subtract(currentPrice, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE);
             double changePercent = BigDecimalUtils.divide(changeValue, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE).doubleValue();
             if (changePercent >= upStopPercent || changePercent <= lowStopPercent) {
+                LOGGER.info("{}股票{}涨停或者跌停!", LOG_PREFIX, stock.getStockCode());
                 redisCacheManage.setUpOrLowerStopStockCache(stock.getStockCode());
             }
         });
@@ -169,7 +170,7 @@ public class StockTask {
      * @return 股票信息
      */
     public StockModel getStock(String stockCode) {
-        LOGGER.info("{}获取股票实时信息，股票数据池：{}", LOG_PREFIX, stockMap.keySet());
+        LOGGER.info("{}获取股票实时信息，股票数据池长度：{}", LOG_PREFIX, stockMap.size());
         StockModel stockModel = stockMap.get(stockCode);
         LOGGER.info("{}获取股票实时信息：{}", LOG_PREFIX, stockModel);
         return stockModel;
