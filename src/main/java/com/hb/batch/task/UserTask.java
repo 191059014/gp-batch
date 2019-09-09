@@ -225,16 +225,18 @@ public class UserTask {
         BigDecimal profit = StockTools.calcOrderProfit(orderDO.getBuyPrice(), currentPrice, orderDO.getBuyNumber());
         // 卖出 价格
         orderDO.setSellPrice(currentPrice);
+        // 卖出股数
+        orderDO.setSellNumber(orderDO.getBuyNumber());
         // 卖出总价格
         orderDO.setSellPriceTotal(BigDecimalUtils.add(strategyMoney, profit));
+        // 卖出时间
+        orderDO.setSellTime(new Date());
         // 订单状态
         orderDO.setOrderStatus(OrderStatusEnum.ALREADY_SELL.getValue());
         // 利润
         orderDO.setProfit(profit);
         // 盈亏率
         orderDO.setProfitRate(StockTools.calcOrderProfitRate(profit, strategyMoney));
-        // 卖出时间
-        orderDO.setSellTime(new Date());
         int backDays = StockTools.calcBackDays(orderDO.getCreateTime(), orderDO.getDelayDays());
         LOGGER.info(LogUtils.appLog("卖出，需要退还的递延金的天数：{}"), backDays);
         BigDecimal backDelayMoney = BigDecimal.ZERO;
