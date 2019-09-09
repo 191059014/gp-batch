@@ -8,12 +8,15 @@
         <result column="agentName" property="agentName" jdbcType="VARCHAR"/>
         <result column="accountTotalMoney" property="accountTotalMoney" jdbcType="DECIMAL"/>
         <result column="freezeMoney" property="freezeMoney" jdbcType="DECIMAL"/>
+        <result column="tradeFreezeMoney" property="tradeFreezeMoney" jdbcType="DECIMAL"/>
         <result column="usableMoney" property="usableMoney" jdbcType="DECIMAL"/>
         <result column="totalRechargeMoney" property="totalRechargeMoney" jdbcType="DECIMAL"/>
         <result column="totalWithdrawMoney" property="totalWithdrawMoney" jdbcType="DECIMAL"/>
         <result column="totalProfitAndLossMoney" property="totalProfitAndLossMoney" jdbcType="DECIMAL"/>
         <result column="totalMessageServiceMoney" property="totalMessageServiceMoney" jdbcType="DECIMAL"/>
         <result column="totalInAndOutMoney" property="totalInAndOutMoney" jdbcType="DECIMAL"/>
+        <result column="totalStrategyMoney" property="totalStrategyMoney" jdbcType="DECIMAL"/>
+        <result column="totalStrategyOwnMoney" property="totalStrategyOwnMoney" jdbcType="DECIMAL"/>
         <result column="createTime" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="createUserId" property="createUserId" jdbcType="VARCHAR"/>
         <result column="updateTime" property="updateTime" jdbcType="TIMESTAMP"/>
@@ -104,6 +107,9 @@
             <if test="freezeMoney != null">
                 freezeMoney = #{freezeMoney,jdbcType=DECIMAL},
             </if>
+            <if test="tradeFreezeMoney != null">
+                tradeFreezeMoney = #{tradeFreezeMoney,jdbcType=DECIMAL},
+            </if>
             <if test="usableMoney != null">
                 usableMoney = #{usableMoney,jdbcType=DECIMAL},
             </if>
@@ -121,6 +127,12 @@
             </if>
             <if test="totalInAndOutMoney != null">
                 totalInAndOutMoney = #{totalInAndOutMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="totalStrategyMoney != null">
+                totalStrategyMoney = #{totalStrategyMoney,jdbcType=DECIMAL},
+            </if>
+            <if test="totalStrategyOwnMoney != null">
+                totalStrategyOwnMoney = #{totalStrategyOwnMoney,jdbcType=DECIMAL},
             </if>
             <if test="createTime != null">
                 createTime = #{createTime,jdbcType=TIMESTAMP},
