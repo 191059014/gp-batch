@@ -153,12 +153,14 @@ public class StockTask {
             stockMap.put(stock.getStockCode(), stock);
             // 涨停或者跌停股票处理
             BigDecimal currentPrice = stock.getCurrentPrice();
-            BigDecimal yesterdayClosePrice = stock.getYesterdayClosePrice();
-            BigDecimal changeValue = BigDecimalUtils.subtract(currentPrice, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE);
-            double changePercent = BigDecimalUtils.divide(changeValue, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE).doubleValue();
-            if (changePercent >= upStopPercent || changePercent <= lowStopPercent) {
-                LOGGER.info("{}股票{}涨停或者跌停!", LOG_PREFIX, stock.getStockCode());
-                redisCacheManage.setUpOrLowerStopStockCache(stock.getStockCode());
+            if (BigDecimal.ZERO.compareTo(currentPrice) != 0) {
+                BigDecimal yesterdayClosePrice = stock.getYesterdayClosePrice();
+                BigDecimal changeValue = BigDecimalUtils.subtract(currentPrice, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE);
+                double changePercent = BigDecimalUtils.divide(changeValue, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE).doubleValue();
+                if (changePercent >= upStopPercent || changePercent <= lowStopPercent) {
+                    LOGGER.info("{}股票{}涨停或者跌停!", LOG_PREFIX, stock.getStockCode());
+                    redisCacheManage.setUpOrLowerStopStockCache(stock.getStockCode());
+                }
             }
         });
     }
