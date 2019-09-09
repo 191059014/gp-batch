@@ -236,6 +236,23 @@ public class UserTask {
         // 盈亏率
         orderDO.setProfitRate(StockTools.calcOrderProfitRate(profit, strategyMoney));
         int backDays = StockTools.calcBackDays(orderDO.getCreateTime(), orderDO.getDelayDays());
+        // 计算退还递延天数和已递延天数
+        Calendar c1 = Calendar.getInstance();
+        c1.setTime(new Date());
+        int nowDate = c1.get(Calendar.DATE);
+        Calendar c2 = Calendar.getInstance();
+        c2.setTime(orderDO.getBuyTime());
+        int buyDate = c2.get(Calendar.DATE);
+        Calendar c3 = Calendar.getInstance();
+        c3.setTime(orderDO.getDelayEndTime());
+        int delayEndDate = c3.get(Calendar.DATE);
+        if (nowDate == buyDate || nowDate == delayEndDate) {
+            // 当前或者是卖出日期，退还为0，已递延为递延总天数-1-退换天数
+            backDays = 0;
+            orderDO.setAlreadyDelayDays(orderDO.getDelayDays() - 1);
+        } else {
+            orderDO.setAlreadyDelayDays(orderDO.getDelayDays() - 1 - backDays);
+        }
         LOGGER.info(LogUtils.appLog("卖出，需要退还的递延金的天数：{}"), backDays);
         BigDecimal backDelayMoney = BigDecimal.ZERO;
         // 退换的递延天数
