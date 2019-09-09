@@ -170,12 +170,13 @@ public class UserTask {
                     earn = true;
                 }
                 BigDecimal strategyOwnMoney = orderDO.getStrategyOwnMoney();
+                BigDecimal strategyMoney = orderDO.getStrategyMoney();
                 BigDecimal appendMoney = orderDO.getAppendMoney();
                 BigDecimal totalStrategyOwnMoney = BigDecimalUtils.add(strategyOwnMoney, appendMoney);
                 if (earn) {
                     // 盈利
                     BigDecimal totalProfit = StockTools.calcOrderProfit(buyPrice, currentPrice, buyNumber);
-                    BigDecimal maxProfit = BigDecimalUtils.multiply(totalStrategyOwnMoney, SystemConfig.getAppJson().getStopMaxPercent());
+                    BigDecimal maxProfit = BigDecimalUtils.multiply(strategyMoney, SystemConfig.getAppJson().getStopMaxPercent());
                     if (totalProfit.compareTo(maxProfit) >= 0) {
                         // 盈利达到最大限度，平仓
                         String message = LOG_PREFIX + "用户【" + userName + "】，订单号【" + orderId + "】，当前价格【" + currentPrice + "】，已经达到盈利阀值【" + totalProfit + "】，进行强制平仓，请及时处理！";

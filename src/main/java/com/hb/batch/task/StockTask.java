@@ -3,16 +3,20 @@ package com.hb.batch.task;
 import com.hb.batch.service.IStockListService;
 import com.hb.batch.util.StockUtils;
 import com.hb.facade.entity.StockListDO;
+import com.hb.facade.tool.RedisCacheManage;
 import com.hb.remote.model.StockModel;
 import com.hb.remote.service.IStockService;
+import com.hb.unic.cache.service.ICacheService;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
+import com.hb.unic.util.util.BigDecimalUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,10 +45,16 @@ public class StockTask {
     private IStockListService stockListService;
 
     @Autowired
-    private OrderTask orderTask;
+    private RedisCacheManage redisCacheManage;
 
     @Value("${stock.valid.timeInterval}")
     private Double stockValidTimeInterval;
+
+    @Value("${stock.up.stop.percent}")
+    private double upStopPercent;
+
+    @Value("${stock.low.stop.percent}")
+    private double lowStopPercent;
 
     /**
      * 股票实时信息数据池
@@ -107,7 +117,7 @@ public class StockTask {
      */
     public void execute() {
         LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
-        Set<String> stockCodeSet = orderTask.getStockCodeSet();
+        Set<String> stockCodeSet = stockListService.getAllStockCode();
         if (CollectionUtils.isEmpty(stockCodeSet)) {
             return;
         }
@@ -141,6 +151,14 @@ public class StockTask {
         stockModelList.forEach(stock -> {
             stock.setLastUpdateTime(System.currentTimeMillis());
             stockMap.put(stock.getStockCode(), stock);
+            // 涨停或者跌停股票处理
+            BigDecimal currentPrice = stock.getCurrentPrice();
+            BigDecimal yesterdayClosePrice = stock.getYesterdayClosePrice();
+            BigDecimal changeValue = BigDecimalUtils.subtract(currentPrice, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE);
+            double changePercent = BigDecimalUtils.divide(changeValue, yesterdayClosePrice, BigDecimalUtils.TEN_SCALE).doubleValue();
+            if (changePercent >= upStopPercent || changePercent <= lowStopPercent) {
+                redisCacheManage.setUpOrLowerStopStockCache(stock.getStockCode());
+            }
         });
     }
 

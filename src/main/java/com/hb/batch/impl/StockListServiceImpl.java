@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * ========== 股票相关service实现类 ==========
@@ -60,6 +61,11 @@ public class StockListServiceImpl implements IStockListService, InitializingBean
             }
         }
         return result;
+    }
+
+    @Override
+    public Set<String> getAllStockCode() {
+        return stockListMap.values().stream().map(StockListDO::getCode).collect(Collectors.toSet());
     }
 
     @Override
