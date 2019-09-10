@@ -58,6 +58,8 @@ public class CalcResidueDelayDaysTask {
             LOGGER.info("{}订单:{}剩余递延天数：{}", LOG_PREFIX, orderId, residueDelayDays);
             OrderDO update = new OrderDO(orderId);
             update.setResidueDelayDays(residueDelayDays);
+            // 已递延天数
+            update.setAlreadyDelayDays(orderDO.getDelayDays() - 1 - residueDelayDays);
             iOrderService.updateByPrimaryKeySelective(update);
             alarmTools.alert("风控", "订单", "计算订单剩余递延天数", "用户【" + orderDO.getUserName() + "】，订单【" + orderId + "】剩余递延天数：" + residueDelayDays + "天，递延到期时间：" + DateUtils.date2str(orderDO.getDelayEndTime(), DateUtils.DEFAULT_FORMAT));
         } catch (Exception e) {

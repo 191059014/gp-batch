@@ -26,8 +26,8 @@
         <result column="residueDelayDays" property="residueDelayDays" jdbcType="INTEGER"/>
         <result column="backDelayDays" property="backDelayDays" jdbcType="INTEGER"/>
 
-        <result column="appendMoney" property="appendMoney" jdbcType="DECIMAL"/>
         <result column="delayDays" property="delayDays" jdbcType="INTEGER"/>
+        <result column="alreadyDelayDays" property="alreadyDelayDays" jdbcType="INTEGER"/>
 
         <result column="buyTime" property="buyTime" jdbcType="TIMESTAMP"/>
         <result column="delayEndTime" property="delayEndTime" jdbcType="TIMESTAMP"/>
@@ -113,11 +113,11 @@
             <if test="stopLossMoney != null">
                 stopLossMoney = #{stopLossMoney,jdbcType=DECIMAL},
             </if>
-            <if test="appendMoney != null">
-                appendMoney = #{appendMoney,jdbcType=DECIMAL},
-            </if>
             <if test="delayDays != null">
                 delayDays = #{delayDays,jdbcType=INTEGER},
+            </if>
+            <if test="alreadyDelayDays != null">
+                alreadyDelayDays = #{alreadyDelayDays,jdbcType=INTEGER},
             </if>
             <if test="buyTime != null">
                 buyTime = #{buyTime,jdbcType=TIMESTAMP},
