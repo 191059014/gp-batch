@@ -309,6 +309,7 @@ public class UserTask {
             backDelayDetail.setAfterHappenMoney(backDelayMoney);
             backDelayDetail.setFundType(FundTypeEnum.DELAY_BACK.getValue());
             backDelayDetail.setRemark(FundTypeEnum.DELAY_BACK.getDesc());
+            backDelayDetail.setUnit(agent.getUnit());
             LOGGER.info(LogUtils.appLog("卖出-退还递延金流水：{}"), backDelayDetail);
             iCustomerFundDetailService.addOne(backDelayDetail);
         }
