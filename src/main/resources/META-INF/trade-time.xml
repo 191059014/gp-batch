@@ -28,7 +28,7 @@
     <!-- 下午13:00到15:00的交易时间 -->
     <bean id="tradeTimePMCalendar" class="org.quartz.impl.calendar.DailyCalendar">
         <constructor-arg ref="tradeDayCalendar" />
-        <constructor-arg value="12:57" type="java.lang.String" />
+        <constructor-arg value="12:40" type="java.lang.String" />
         <constructor-arg value="15:03" type="java.lang.String" />
         <!-- include hours between start and end -->
         <property name="invertTimeRange" value="true" />
