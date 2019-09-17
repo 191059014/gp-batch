@@ -5,7 +5,6 @@ import com.hb.facade.entity.OrderDO;
 import com.hb.facade.enumutil.OrderStatusEnum;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
-import com.hb.unic.util.util.DateUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +27,6 @@ public class OrderTask {
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderTask.class);
     /**
-     * 最后一次查询时间
-     */
-    public static volatile Long lastQueryTime = null;
-    /**
      * 订单实时待处理数据集合
      */
     private static volatile Map<String, OrderDO> orderMap = new ConcurrentHashMap<>();
@@ -43,13 +38,8 @@ public class OrderTask {
 
     public void execute() {
         LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
-        Date lastQueryDate = null;
-        if (lastQueryTime != null) {
-            lastQueryDate = new Date(lastQueryTime);
-        }
-        lastQueryTime = System.currentTimeMillis();
-        List<OrderDO> orderList = getPendingOrderList(lastQueryDate);
-        LOGGER.info("{}最后一次查询时间：{}，查询待处理订单结果：{}", LOG_PREFIX, lastQueryDate == null ? "" : DateUtils.date2str(lastQueryDate, DateUtils.FORMAT_MS), orderList.size());
+        List<OrderDO> orderList = getPendingOrderList();
+        LOGGER.info("{}查询待处理订单结果：{}", LOG_PREFIX, orderList.size());
         if (CollectionUtils.isNotEmpty(orderList)) {
             flushOrderMap(orderList);
         }
@@ -58,13 +48,12 @@ public class OrderTask {
     /**
      * 查询待处理（持仓中）的订单
      *
-     * @param lastQueryDate 查询时间
      * @return 待处理订单
      */
-    public List<OrderDO> getPendingOrderList(Date lastQueryDate) {
+    public List<OrderDO> getPendingOrderList() {
         Set<Integer> orderStatuSet = new HashSet<>();
         orderStatuSet.add(OrderStatusEnum.IN_THE_POSITION.getValue());
-        return orderService.getOrderListByOrderStatusAndTime(orderStatuSet, lastQueryDate);
+        return orderService.getOrderListByOrderStatusAndTime(orderStatuSet);
     }
 
     /**

@@ -60,11 +60,11 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public List<OrderDO> getOrderListByOrderStatusAndTime(Set<Integer> orderStatuSet, Date date) {
+    public List<OrderDO> getOrderListByOrderStatusAndTime(Set<Integer> orderStatuSet) {
         if (orderStatuSet == null || orderStatuSet.size() < 1) {
             return null;
         }
-        return orderMapper.getOrderListByOrderStatusAndTime(orderStatuSet, date);
+        return orderMapper.getOrderListByOrderStatusAndTime(orderStatuSet);
     }
 
     @Override

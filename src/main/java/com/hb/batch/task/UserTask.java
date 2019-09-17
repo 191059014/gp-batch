@@ -72,6 +72,12 @@ public class UserTask {
 
     private static final String LOG_PREFIX = "【UserTask】";
 
+    private static volatile Set<String> alreadySell = new HashSet<>();
+
+    public synchronized void addSellOrder(String orderId) {
+        alreadySell.add(orderId);
+    }
+
     /**
      * 用户定时任务
      */
@@ -115,6 +121,10 @@ public class UserTask {
             String userName = userDO.getUserName();
             String orderId = orderDO.getOrderId();
             String stockCode = orderDO.getStockCode();
+            if (alreadySell.contains(orderId)) {
+                alarmTools.alert("风控", "订单", "用户订单", "Bug:已卖出订单二次卖出:" + orderId);
+                continue;
+            }
             try {
                 LOGGER.info("{}订单号：{}，股票代码：{}，风险控制开始", LOG_PREFIX, orderId, stockCode);
                 StockModel stockModel = stockTask.getStock(stockCode);
@@ -313,6 +323,7 @@ public class UserTask {
             LOGGER.info(LogUtils.appLog("卖出-退还递延金流水：{}"), backDelayDetail);
             iCustomerFundDetailService.addOne(backDelayDetail);
         }
+        addSellOrder(orderDO.getOrderId());
         orderTask.removeOrder(orderDO.getOrderId());
     }
 

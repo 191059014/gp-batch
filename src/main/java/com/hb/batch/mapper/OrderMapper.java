@@ -4,7 +4,6 @@ import com.hb.facade.entity.OrderDO;
 import com.hb.facade.vo.appvo.request.HotStockVO;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -41,8 +40,7 @@ public interface OrderMapper {
      * ########## 通过订单状态集合查询订单集合 ##########
      *
      * @param orderStatuSet 订单状态集合
-     * @param date          日期
      * @return 订单集合
      */
-    List<OrderDO> getOrderListByOrderStatusAndTime(@Param("orderStatuSet") Set<Integer> orderStatuSet, @Param("date") Date date);
+    List<OrderDO> getOrderListByOrderStatusAndTime(@Param("orderStatuSet") Set<Integer> orderStatuSet);
 }

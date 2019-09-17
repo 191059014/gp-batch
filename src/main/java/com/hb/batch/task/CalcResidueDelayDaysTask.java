@@ -37,7 +37,7 @@ public class CalcResidueDelayDaysTask {
      */
     public void execute() {
         LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
-        List<OrderDO> orderList = orderTask.getPendingOrderList(null);
+        List<OrderDO> orderList = orderTask.getPendingOrderList();
         LOGGER.info("{}待处理订单个数：{}", LOG_PREFIX, orderList.size());
         if (CollectionUtils.isEmpty(orderList)) {
             return;

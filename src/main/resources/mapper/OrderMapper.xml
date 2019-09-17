@@ -200,9 +200,6 @@
             #{orderStatus}
         </foreach>
         and recordStatus=1
-        <if test="date != null">
-            <![CDATA[ and updateTime >= #{date} ]]>
-        </if>
     </select>
 
     <sql id="selectByConditionSql">
