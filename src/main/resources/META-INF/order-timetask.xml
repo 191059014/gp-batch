@@ -12,6 +12,7 @@
           class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
         <property name="targetObject" ref="orderTask" />
         <property name="targetMethod" value="execute" />
+        <property name="concurrent" value="false"/>
     </bean>
 
     <!-- 配置上午监控上交所的任务触发器。 -->
