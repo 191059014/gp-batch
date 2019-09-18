@@ -37,6 +37,7 @@ public class OrderTask {
     private IOrderService orderService;
 
     public void execute() {
+        orderMap.clear();
         LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
         List<OrderDO> orderList = getPendingOrderList();
         LOGGER.info("{}查询待处理订单结果：{}", LOG_PREFIX, orderList.size());

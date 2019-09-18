@@ -27,7 +27,7 @@
             <!-- 日志文件保留天数-->
             <maxHistory>7</maxHistory>
             <!-- 日志文件保留天数-->
-            <maxFileSize>10MB</maxFileSize>
+            <maxFileSize>20MB</maxFileSize>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--日志输出格式-->
@@ -57,7 +57,7 @@
             <!-- 日志文件保留天数-->
             <maxHistory>7</maxHistory>
             <!-- 日志文件保留天数-->
-            <maxFileSize>5MB</maxFileSize>
+            <maxFileSize>10MB</maxFileSize>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <!--日志输出格式-->
