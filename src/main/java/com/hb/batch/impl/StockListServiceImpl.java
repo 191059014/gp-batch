@@ -50,6 +50,11 @@ public class StockListServiceImpl implements IStockListService, InitializingBean
 
     @Override
     public List<StockListDO> getStockListBySet(Set<String> stockCodeSet) {
+        return stockListMapper.getStockListByStockCodeSet(stockCodeSet);
+    }
+
+    @Override
+    public List<StockListDO> getStockListBySetFromCache(Set<String> stockCodeSet) {
         if (CollectionUtils.isEmpty(stockCodeSet)) {
             return null;
         }

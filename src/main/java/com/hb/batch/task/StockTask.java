@@ -6,7 +6,6 @@ import com.hb.facade.entity.StockListDO;
 import com.hb.facade.tool.RedisCacheManage;
 import com.hb.remote.model.StockModel;
 import com.hb.remote.service.IStockService;
-import com.hb.unic.cache.service.ICacheService;
 import com.hb.unic.logger.Logger;
 import com.hb.unic.logger.LoggerFactory;
 import com.hb.unic.util.util.BigDecimalUtils;
@@ -84,7 +83,7 @@ public class StockTask {
      * @param querySet 股票代码集合
      */
     public List<StockModel> flush(Set<String> querySet) {
-        List<StockListDO> stockListDOList = stockListService.getStockListBySet(querySet);
+        List<StockListDO> stockListDOList = stockListService.getStockListBySetFromCache(querySet);
         List<String> stockCodeList = new ArrayList<>();
         for (StockListDO stockListDO : stockListDOList) {
             stockCodeList.add(stockListDO.getFull_code());

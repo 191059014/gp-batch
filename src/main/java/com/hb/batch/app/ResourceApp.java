@@ -114,7 +114,7 @@ public class ResourceApp extends BaseApp {
         try {
             Set<String> stockSet = iOrderService.getHotStockSet(number);
             LOGGER.info(LogUtils.appLog("查询热门股票，股票代码：{}"), stockSet);
-            List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockSet);
+            List<StockListDO> stockListDOList = stockListService.getStockListBySetFromCache(stockSet);
             LOGGER.info(LogUtils.appLog("查询热门股票，查询数据库结果：{}"), stockListDOList);
             if (CollectionUtils.isEmpty(stockListDOList)) {
                 return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS);
