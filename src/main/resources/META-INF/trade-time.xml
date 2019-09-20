@@ -20,7 +20,7 @@
     <bean id="tradeTimeAMCalendar" class="org.quartz.impl.calendar.DailyCalendar">
         <constructor-arg ref="tradeDayCalendar" />
         <constructor-arg value="09:27" type="java.lang.String" />
-        <constructor-arg value="11:33" type="java.lang.String" />
+        <constructor-arg value="15:03" type="java.lang.String" />
         <!-- include hours between start and end -->
         <property name="invertTimeRange" value="true" />
     </bean>
@@ -29,7 +29,7 @@
     <bean id="tradeTimePMCalendar" class="org.quartz.impl.calendar.DailyCalendar">
         <constructor-arg ref="tradeDayCalendar" />
         <constructor-arg value="12:57" type="java.lang.String" />
-        <constructor-arg value="15:03" type="java.lang.String" />
+        <constructor-arg value="22:03" type="java.lang.String" />
         <!-- include hours between start and end -->
         <property name="invertTimeRange" value="true" />
     </bean>
