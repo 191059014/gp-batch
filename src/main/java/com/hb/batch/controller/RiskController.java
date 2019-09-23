@@ -61,8 +61,6 @@ public class RiskController {
         for (OrderDO orderDO : orderList) {
             responseVO = new BackRiskControlResponseVO(orderDO.getOrderId());
             BigDecimal currentPrice = stockModelMap.get(orderDO.getStockCode()).getCurrentPrice();
-            int i = new Random().nextInt(10);
-            currentPrice = BigDecimalUtils.add(currentPrice,new BigDecimal(i));
             BigDecimal profit = StockTools.calcOrderProfit(orderDO.getBuyPrice(), currentPrice, orderDO.getBuyNumber());
             responseVO.setCurrentPrice(currentPrice);
             responseVO.setProfit(profit);
