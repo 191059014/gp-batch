@@ -1,6 +1,6 @@
 {
   "android": {
-    "versionCode": 1,
+    "versionCode": 33,
     "versionName": "1.0.0",
     "apkDownloadUrl": "http://121.40.94.96:8080/web/apk/app.apk"
   },
