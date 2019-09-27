@@ -125,6 +125,10 @@ public class UserTask {
                 alarmTools.alert("风控", "订单", "用户订单", "Bug:已卖出订单二次卖出:" + orderId);
                 continue;
             }
+            if (StockTools.todayIsBuyDate(orderDO.getBuyTime())) {
+                // 买入当天不走风控
+                continue;
+            }
             try {
                 LOGGER.info("{}订单号：{}，股票代码：{}，风险控制开始", LOG_PREFIX, orderId, stockCode);
                 StockModel stockModel = stockTask.getStock(stockCode);
