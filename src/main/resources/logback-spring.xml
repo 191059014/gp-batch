@@ -69,16 +69,6 @@
         </encoder>
     </appender>
 
-    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>localhost:5044</destination>
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder"/>
-    </appender>
-
-    <!--设置elk日志级别-->
-    <logger name="elk" level="INFO">
-        <appender-ref ref="LOGSTASH"/>
-    </logger>
-
     <!--设置日志级别-->
     <logger name="gpbatch" level="${logging.level}" additivity="false">
         <appender-ref ref="STDOUT"/>
