@@ -1,6 +1,6 @@
 {
   "android": {
-    "versionCode": 33,
+    "versionCode": 39,
     "versionName": "1.0.0",
     "apkDownloadUrl": "http://121.40.94.96:8080/web/apk/app.apk"
   },
@@ -23,9 +23,9 @@
     "20191007"
   ],
   "publicBankAccount": {
-    "bankName": "中国银行",
-    "bankNum": "123456789",
-    "bankAddress": "武汉市武昌区**支行"
+    "bankName": "郑州泽尊网络科技有限公司",
+    "bankNum": "1702229109200026722",
+    "bankAddress": "中国工商银行股份有限公司郑州投资大厦支行"
   },
-  "payQrcodeImage": "http://www.yuanlinb.com:8090/web/img/payment.png"
+  "payQrcodeImage": "http://www.zezuncelve.com:8090/web/img/payment.png"
 }
