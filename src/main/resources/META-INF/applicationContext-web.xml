@@ -15,6 +15,7 @@
     <import resource="stock-timetask.xml"/>
     <import resource="user-timetask.xml"/>
     <import resource="calc-residuedelaydays-timetask.xml"/>
+    <import resource="lastest-stockinfo-timetask.xml"/>
 
     <!-- mapper -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
