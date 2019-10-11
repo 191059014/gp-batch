@@ -1,10 +1,12 @@
 package com.hb.batch.app;
 
 import com.hb.batch.service.IOrderService;
+import com.hb.batch.service.IRiskControlService;
 import com.hb.batch.service.IStockListService;
 import com.hb.batch.util.LogUtils;
 import com.hb.batch.vo.StockIndexQueryResponseVO;
 import com.hb.batch.vo.StockQueryResponseVO;
+import com.hb.facade.calc.StockTools;
 import com.hb.facade.common.AppResponseCodeEnum;
 import com.hb.facade.common.AppResultModel;
 import com.hb.facade.entity.StockListDO;
@@ -54,21 +56,28 @@ public class ResourceApp extends BaseApp {
     @Autowired
     private IStockListService stockListService;
 
+    @Autowired
+    private IRiskControlService iRiskControlService;
+
     @ApiOperation(value = "根据股票代码获取股票信息")
     @PostMapping("/queryStockList")
     public AppResultModel<StockQueryResponseVO> queryStockList(@RequestBody StockQueryRequestVO stockQueryRequestVO) {
         LOGGER.info(LogUtils.appLog("根据股票代码获取股票信息，入参：{}"), stockQueryRequestVO);
         List<StockModel> stockModels = null;
         try {
-            List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockQueryRequestVO.getStockCodeSet());
-            if (stockListDOList == null) {
-                return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS);
+            if (StockTools.stockOnLine()) {
+                List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockQueryRequestVO.getStockCodeSet());
+                if (stockListDOList == null) {
+                    return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS);
+                }
+                Set<String> fullCodeList = new HashSet<>();
+                for (StockListDO stockListDO : stockListDOList) {
+                    fullCodeList.add(stockListDO.getFull_code());
+                }
+                stockModels = iStockService.queryStockList(fullCodeList);
+            } else {
+                stockModels = iRiskControlService.getNotTradeTimeStockInfo(stockQueryRequestVO.getStockCodeSet());
             }
-            Set<String> fullCodeList = new HashSet<>();
-            for (StockListDO stockListDO : stockListDOList) {
-                fullCodeList.add(stockListDO.getFull_code());
-            }
-            stockModels = iStockService.queryStockList(fullCodeList);
         } catch (Exception e) {
             String stackTrace = LogUtils.getStackTrace(e);
             LOGGER.error(LogUtils.appLog("根据股票代码获取股票信息,系统异常：{}"), stackTrace);
@@ -114,17 +123,21 @@ public class ResourceApp extends BaseApp {
         try {
             Set<String> stockSet = iOrderService.getHotStockSet(number);
             LOGGER.info(LogUtils.appLog("查询热门股票，股票代码：{}"), stockSet);
-            List<StockListDO> stockListDOList = stockListService.getStockListBySetFromCache(stockSet);
-            LOGGER.info(LogUtils.appLog("查询热门股票，查询数据库结果：{}"), stockListDOList);
-            if (CollectionUtils.isEmpty(stockListDOList)) {
-                return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS);
+            if (StockTools.stockOnLine()) {
+                List<StockListDO> stockListDOList = stockListService.getStockListBySetFromCache(stockSet);
+                LOGGER.info(LogUtils.appLog("查询热门股票，查询数据库结果：{}"), stockListDOList);
+                if (CollectionUtils.isEmpty(stockListDOList)) {
+                    return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS);
+                }
+                Set<String> fullCodeSet = new HashSet<>();
+                for (StockListDO stockListDO : stockListDOList) {
+                    fullCodeSet.add(stockListDO.getFull_code());
+                }
+                // 根据股票代码查询信息
+                stockModelList = iStockService.queryStockList(fullCodeSet);
+            } else {
+                stockModelList = iRiskControlService.getNotTradeTimeStockInfo(stockSet);
             }
-            Set<String> fullCodeSet = new HashSet<>();
-            for (StockListDO stockListDO : stockListDOList) {
-                fullCodeSet.add(stockListDO.getFull_code());
-            }
-            // 根据股票代码查询信息
-            stockModelList = iStockService.queryStockList(fullCodeSet);
         } catch (Exception e) {
             String stackTrace = LogUtils.getStackTrace(e);
             LOGGER.error(LogUtils.appLog("查询热门股票,系统异常：{}"), stackTrace);
