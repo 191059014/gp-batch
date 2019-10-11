@@ -69,6 +69,11 @@ public class StockListServiceImpl implements IStockListService, InitializingBean
     }
 
     @Override
+    public Set<String> getAllFullStockCode() {
+        return stockListMap.values().stream().map(StockListDO::getFull_code).collect(Collectors.toSet());
+    }
+
+    @Override
     public Set<String> getAllStockCode() {
         return stockListMap.values().stream().map(StockListDO::getCode).collect(Collectors.toSet());
     }
