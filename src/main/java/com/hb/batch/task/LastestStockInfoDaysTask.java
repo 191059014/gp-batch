@@ -59,15 +59,8 @@ public class LastestStockInfoDaysTask {
      */
     public void execute() {
         LOGGER.info("{}当前线程：{}", LOG_PREFIX, Thread.currentThread().getName());
-        Set<Integer> orderStatus = new HashSet<>();
-        orderStatus.add(OrderStatusEnum.IN_THE_POSITION.getValue());
-        orderStatus.add(OrderStatusEnum.ALREADY_SELL.getValue());
-        Set<String> stockCodeSet = iOrderService.getStockCodeByOrderStatus(orderStatus);
-        List<StockListDO> stockListDOList = stockListService.getStockListBySetFromCache(stockCodeSet);
-        List<String> stockCodeList = new ArrayList<>();
-        for (StockListDO stockListDO : stockListDOList) {
-            stockCodeList.add(stockListDO.getFull_code());
-        }
+        Set<String> allFullStockCode = stockListService.getAllFullStockCode();
+        List<String> stockCodeList = new ArrayList<>(allFullStockCode);
         int total = stockCodeList.size();
         int i = 1;
         List<StockModel> resultList = new ArrayList<>();
