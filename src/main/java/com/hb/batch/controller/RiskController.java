@@ -1,6 +1,7 @@
 package com.hb.batch.controller;
 
 import com.hb.batch.app.BaseApp;
+import com.hb.batch.service.IRiskControlService;
 import com.hb.batch.service.IStockListService;
 import com.hb.facade.calc.StockTools;
 import com.hb.facade.common.ResponseData;
@@ -10,7 +11,6 @@ import com.hb.facade.entity.StockListDO;
 import com.hb.facade.vo.webvo.response.BackRiskControlResponseVO;
 import com.hb.remote.model.StockModel;
 import com.hb.remote.service.IStockService;
-import com.hb.unic.util.util.BigDecimalUtils;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,9 @@ public class RiskController {
     @Autowired
     private IStockListService stockListService;
 
+    @Autowired
+    private IRiskControlService iRiskControlService;
+
     @ApiOperation(value = "计算当前时间的利润")
     @RequestMapping("/calcProfitCurrentTime")
     public ResponseData<List<BackRiskControlResponseVO>> calcProfitCurrentTime(@RequestBody List<OrderDO> orderList) {
@@ -46,15 +49,20 @@ public class RiskController {
             return ResponseData.generateResponseData(ResponseEnum.ERROR_PARAM_VERIFY);
         }
         Set<String> stockCodeSet = orderList.stream().map(OrderDO::getStockCode).collect(Collectors.toSet());
-        List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockCodeSet);
-        if (stockListDOList == null) {
-            return ResponseData.generateResponseData(ResponseEnum.SUCCESS);
+        List<StockModel> stockModelList = null;
+        if (StockTools.stockOnLine()) {
+            List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockCodeSet);
+            if (stockListDOList == null) {
+                return ResponseData.generateResponseData(ResponseEnum.SUCCESS);
+            }
+            Set<String> fullCodeList = new HashSet<>();
+            for (StockListDO stockListDO : stockListDOList) {
+                fullCodeList.add(stockListDO.getFull_code());
+            }
+            stockModelList = iStockService.queryStockList(fullCodeList);
+        } else {
+            stockModelList = iRiskControlService.getNotTradeTimeStockInfo(stockCodeSet);
         }
-        Set<String> fullCodeList = new HashSet<>();
-        for (StockListDO stockListDO : stockListDOList) {
-            fullCodeList.add(stockListDO.getFull_code());
-        }
-        List<StockModel> stockModelList = iStockService.queryStockList(fullCodeList);
         Map<String, StockModel> stockModelMap = stockModelList.stream().collect(Collectors.toMap(StockModel::getStockCode, s -> s, (k1, k2) -> k2));
         List<BackRiskControlResponseVO> resultList = new ArrayList<>();
         BackRiskControlResponseVO responseVO = null;
