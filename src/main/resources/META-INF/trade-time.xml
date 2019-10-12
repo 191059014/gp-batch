@@ -12,7 +12,7 @@
 
     <!-- 排除法定节假日的日历。 -->
     <bean id="tradeDayCalendar" class="com.hb.batch.scheduler.SelfDayCalendar">
-        <!--<constructor-arg ref="excludeWeekendsCalendar" />-->
+        <constructor-arg ref="excludeWeekendsCalendar" />
         <constructor-arg value="${tradeDays.legalHolidays}" />
     </bean>
 
