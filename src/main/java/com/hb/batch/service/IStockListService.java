@@ -20,6 +20,8 @@ public interface IStockListService {
 
     List<StockListDO> getStockListBySetFromCache(Set<String> stockCodeSet);
 
+    Set<String> getAllFullStockCode();
+
     Set<String> getAllStockCode();
 
     List<StockListDO> findPageList(String queryText, Integer startRow, Integer pageSize);

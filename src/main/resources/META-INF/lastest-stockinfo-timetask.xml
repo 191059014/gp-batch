@@ -17,7 +17,7 @@
     <!-- 每个交易日下午15：00查询最新行情的任务触发器。 -->
     <bean id="lastestStockInfoDaysTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="lastestStockInfoDaysTaskJobDetail"/>
-        <property name="cronExpression" value="0 20 15 ? * *"></property>
+        <property name="cronExpression" value="0 0 15 ? * *"></property>
         <property name="calendarName" value="tradeDayCalendar"></property>
     </bean>
 
