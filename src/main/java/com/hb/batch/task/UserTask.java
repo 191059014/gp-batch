@@ -306,6 +306,8 @@ public class UserTask {
         customerFund.setTotalStrategyMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyMoney(), strategyMoney));
         // 累计持仓信用金总金额=原累计持仓信用金总金额-持仓信用金
         customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney));
+        // 累计服务费=原累计服务费+服务费+递延费
+        customerFund.setTotalMessageServiceMoney(BigDecimalUtils.subtract(customerFund.getTotalMessageServiceMoney(), backDelayMoney));
         customerFund.setUpdateTime(new Date());
         LOGGER.info(LogUtils.appLog("卖出-更新客户资金信息：{}"), customerFund);
         iCustomerFundService.updateByPrimaryKeySelective(customerFund);
