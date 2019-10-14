@@ -72,12 +72,6 @@ public class UserTask {
 
     private static final String LOG_PREFIX = "【UserTask】";
 
-    private static volatile Set<String> alreadySell = new HashSet<>();
-
-    public synchronized void addSellOrder(String orderId) {
-        alreadySell.add(orderId);
-    }
-
     /**
      * 用户定时任务
      */
@@ -121,10 +115,6 @@ public class UserTask {
             String userName = userDO.getUserName();
             String orderId = orderDO.getOrderId();
             String stockCode = orderDO.getStockCode();
-            if (alreadySell.contains(orderId)) {
-                alarmTools.alert("风控", "订单", "用户订单", "Bug:已卖出订单二次卖出:" + orderId);
-                continue;
-            }
             if (StockTools.todayIsBuyDate(orderDO.getBuyTime())) {
                 // 买入当天不走风控
                 continue;
@@ -299,13 +289,17 @@ public class UserTask {
         // 可用余额=原可用余额+利润+退还的递延金+策略本金
         customerFund.setUsableMoney(BigDecimalUtils.addAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getUsableMoney(), strategyOwnMoney, profit, backDelayMoney));
         // 交易冻结金额=原交易冻结金额-策略本金
-        customerFund.setTradeFreezeMoney(BigDecimalUtils.subtract(customerFund.getTradeFreezeMoney(), strategyOwnMoney));
-        // 总盈亏=原总盈亏+利润
-        customerFund.setTotalProfitAndLossMoney(BigDecimalUtils.add(customerFund.getTotalProfitAndLossMoney(), profit));
+        customerFund.setTradeFreezeMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTradeFreezeMoney(), strategyOwnMoney));
+        // 总盈亏=原总盈亏+利润-服务费-递延费
+        BigDecimal add1 = BigDecimalUtils.add(customerFund.getTotalProfitAndLossMoney(), profit);
+        BigDecimal net = BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, add1, orderDO.getServiceMoney(), orderDO.getDelayMoney());
+        customerFund.setTotalProfitAndLossMoney(net);
         // 累计持仓市值总金额=原累计持仓市值总金额-持仓市值
         customerFund.setTotalStrategyMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyMoney(), strategyMoney));
         // 累计持仓信用金总金额=原累计持仓信用金总金额-持仓信用金
-        customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtract(customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney));
+        customerFund.setTotalStrategyOwnMoney(BigDecimalUtils.subtractAll(BigDecimalUtils.DEFAULT_SCALE, customerFund.getTotalStrategyOwnMoney(), strategyOwnMoney));
+        // 累计服务费=原累计服务费-退还递延费
+        customerFund.setTotalMessageServiceMoney(BigDecimalUtils.subtract(customerFund.getTotalMessageServiceMoney(), backDelayMoney));
         customerFund.setUpdateTime(new Date());
         LOGGER.info(LogUtils.appLog("卖出-更新客户资金信息：{}"), customerFund);
         iCustomerFundService.updateByPrimaryKeySelective(customerFund);
@@ -323,11 +317,9 @@ public class UserTask {
             backDelayDetail.setAfterHappenMoney(backDelayMoney);
             backDelayDetail.setFundType(FundTypeEnum.DELAY_BACK.getValue());
             backDelayDetail.setRemark(FundTypeEnum.DELAY_BACK.getDesc());
-            backDelayDetail.setUnit(agent.getUnit());
             LOGGER.info(LogUtils.appLog("卖出-退还递延金流水：{}"), backDelayDetail);
             iCustomerFundDetailService.addOne(backDelayDetail);
         }
-        addSellOrder(orderDO.getOrderId());
         orderTask.removeOrder(orderDO.getOrderId());
     }
 
