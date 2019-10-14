@@ -14,8 +14,14 @@
         <property name="targetMethod" value="execute"/>
     </bean>
 
+    <!-- 每个交易日下午11：30查询最新行情的任务触发器。 -->
+    <bean id="lastestStockInfoDaysTaskTrigger1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail" ref="lastestStockInfoDaysTaskJobDetail"/>
+        <property name="cronExpression" value="0 30 11 ? * *"></property>
+        <property name="calendarName" value="tradeDayCalendar"></property>
+    </bean>
     <!-- 每个交易日下午15：00查询最新行情的任务触发器。 -->
-    <bean id="lastestStockInfoDaysTaskTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+    <bean id="lastestStockInfoDaysTaskTrigger2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
         <property name="jobDetail" ref="lastestStockInfoDaysTaskJobDetail"/>
         <property name="cronExpression" value="0 0 15 ? * *"></property>
         <property name="calendarName" value="tradeDayCalendar"></property>
@@ -30,7 +36,8 @@
         </property>
         <property name="triggers">
             <list>
-                <ref bean="lastestStockInfoDaysTaskTrigger"/>
+                <ref bean="lastestStockInfoDaysTaskTrigger1"/>
+                <ref bean="lastestStockInfoDaysTaskTrigger2"/>
             </list>
         </property>
     </bean>
