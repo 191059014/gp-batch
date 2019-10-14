@@ -225,7 +225,7 @@ public class UserTask {
      * @param agent      代理商信息
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    public void completeOrder(OrderDO orderDO, StockModel stockModel, UserDO user, AgentDO agent) {
+    public synchronized void completeOrder(OrderDO orderDO, StockModel stockModel, UserDO user, AgentDO agent) {
         String userId = user.getUserId();
         String userName = user.getUserName();
         BigDecimal strategyMoney = orderDO.getStrategyMoney();
