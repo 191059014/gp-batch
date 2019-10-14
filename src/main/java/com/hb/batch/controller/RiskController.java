@@ -50,7 +50,9 @@ public class RiskController {
         }
         Set<String> stockCodeSet = orderList.stream().map(OrderDO::getStockCode).collect(Collectors.toSet());
         List<StockModel> stockModelList = null;
-        if (StockTools.stockOnLine()) {
+        if (StockTools.needObtainStockInfoFromCache()) {
+            stockModelList = iRiskControlService.getNotTradeTimeStockInfo(stockCodeSet);
+        } else {
             List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockCodeSet);
             if (stockListDOList == null) {
                 return ResponseData.generateResponseData(ResponseEnum.SUCCESS);
@@ -60,8 +62,6 @@ public class RiskController {
                 fullCodeList.add(stockListDO.getFull_code());
             }
             stockModelList = iStockService.queryStockList(fullCodeList);
-        } else {
-            stockModelList = iRiskControlService.getNotTradeTimeStockInfo(stockCodeSet);
         }
         Map<String, StockModel> stockModelMap = stockModelList.stream().collect(Collectors.toMap(StockModel::getStockCode, s -> s, (k1, k2) -> k2));
         List<BackRiskControlResponseVO> resultList = new ArrayList<>();

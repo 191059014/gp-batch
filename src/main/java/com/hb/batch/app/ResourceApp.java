@@ -65,7 +65,9 @@ public class ResourceApp extends BaseApp {
         LOGGER.info(LogUtils.appLog("根据股票代码获取股票信息，入参：{}"), stockQueryRequestVO);
         List<StockModel> stockModels = null;
         try {
-            if (StockTools.stockOnLine()) {
+            if (StockTools.needObtainStockInfoFromCache()) {
+                stockModels = iRiskControlService.getNotTradeTimeStockInfo(stockQueryRequestVO.getStockCodeSet());
+            } else {
                 List<StockListDO> stockListDOList = stockListService.getStockListBySet(stockQueryRequestVO.getStockCodeSet());
                 if (stockListDOList == null) {
                     return AppResultModel.generateResponseData(AppResponseCodeEnum.SUCCESS);
@@ -75,8 +77,6 @@ public class ResourceApp extends BaseApp {
                     fullCodeList.add(stockListDO.getFull_code());
                 }
                 stockModels = iStockService.queryStockList(fullCodeList);
-            } else {
-                stockModels = iRiskControlService.getNotTradeTimeStockInfo(stockQueryRequestVO.getStockCodeSet());
             }
         } catch (Exception e) {
             String stackTrace = LogUtils.getStackTrace(e);
@@ -123,7 +123,9 @@ public class ResourceApp extends BaseApp {
         try {
             Set<String> stockSet = iOrderService.getHotStockSet(number);
             LOGGER.info(LogUtils.appLog("查询热门股票，股票代码：{}"), stockSet);
-            if (StockTools.stockOnLine()) {
+            if (StockTools.needObtainStockInfoFromCache()) {
+                stockModelList = iRiskControlService.getNotTradeTimeStockInfo(stockSet);
+            } else {
                 List<StockListDO> stockListDOList = stockListService.getStockListBySetFromCache(stockSet);
                 LOGGER.info(LogUtils.appLog("查询热门股票，查询数据库结果：{}"), stockListDOList);
                 if (CollectionUtils.isEmpty(stockListDOList)) {
@@ -135,8 +137,6 @@ public class ResourceApp extends BaseApp {
                 }
                 // 根据股票代码查询信息
                 stockModelList = iStockService.queryStockList(fullCodeSet);
-            } else {
-                stockModelList = iRiskControlService.getNotTradeTimeStockInfo(stockSet);
             }
         } catch (Exception e) {
             String stackTrace = LogUtils.getStackTrace(e);
