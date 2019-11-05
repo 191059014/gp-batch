@@ -79,11 +79,31 @@ public class LastestStockInfoDaysTask {
             }
             i++;
         }
-        LOGGER.info("{}刷新非交易时间行情信息：{}", LOG_PREFIX, resultList);
-        if (resultList.size() > 0) {
-            for (StockModel stockModel : resultList) {
-                // 添加最新的
-                redisCacheService.set(GeneralConst.NOT_TRADE_STOCK_INFO_CACHE_KEY + stockModel.getStockCode(), stockModel);
+        int size = resultList.size();
+        LOGGER.warn("{}刷新非交易时间行情信息：{}", LOG_PREFIX, size);
+        if (size > 0) {
+            int number = 200;
+            int start = 0;
+            while (Math.multiplyExact(start, number) <= size) {
+                int startIndex = start * number;
+                int endIndex = 0;
+                if (Math.multiplyExact(start + 1, number) > size) {
+                    endIndex = size - 1;
+                } else {
+                    endIndex = (start + 1) * number;
+                }
+                LOGGER.warn("startIndex：{}，endIndex：{}", startIndex, endIndex);
+                List<StockModel> stockModels = resultList.subList(startIndex, endIndex);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (StockModel stockModel : resultList) {
+                            // 添加最新的
+                            redisCacheService.set(GeneralConst.NOT_TRADE_STOCK_INFO_CACHE_KEY + stockModel.getStockCode(), stockModel);
+                        }
+                    }
+                }).start();
+                start++;
             }
         }
 
